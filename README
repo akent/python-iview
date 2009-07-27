@@ -1,0 +1,70 @@
+Python command-line and GTK+ interface to ABC iView
+Copyright (C) 2009 by Jeremy Visser <jeremy@visser.name>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+Requirements
+============
+
+* Python 2.6 <http://www.python.org/>
+* BeautifulSoup <http://www.crummy.com/software/BeautifulSoup/>
+* FLVStreamer <http://savannah.nongnu.org/projects/flvstreamer/>
+
+Installation
+============
+
+1. Make sure Python 2.6 is installed and working.
+2. Make sure BeautifulSoup is installed in Python and working.
+3. Build FLVStreamer and copy flvstreamer_x86 to somewhere within $PATH (e.g. /usr/local/bin).
+4. Either run ./iview-cli or ./iview-gtk.
+
+Usage
+=====
+
+Some usage examples are provided for your perusal.
+
+This is a purely informational command, and verifies that handshaking is
+working correctly.
+
+	$ ./iview-cli --handshake
+	iView auth data:
+		Token: XXXXXXXXXXXXXXXXXXXX
+		RTMP URL: rtmp://203.18.195.10/ondemand
+		Unmetered: True
+
+This can be used to view the iView programme and find the program URL:
+
+	$ ./iview-cli --programme
+	ABC News:
+		7.30 Report 16/07/09	(news/730report_090716)
+		7.30 Report 15/07/09	(news/730report_090715)
+		7.30 Report 14/07/09	(news/730report_090714)
+		7.30 Report 13/07/09	(news/730report_090713)
+	[...]
+
+To actually download the program, use something like the following:
+
+	$ ./iview-cli --download news/730report_090716
+
+If FLVStreamer is all set up correctly, hopefully that will download
+an .flv file into your current directory, appropriately named. If it
+didn't work, type "flvstreamer_x86" and see if it does anything. If
+not, install it, or put it somewhere on your $PATH.
+
+Hacking
+=======
+
+Uh...good luck.
+
+:wq

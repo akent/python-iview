@@ -1,0 +1,95 @@
+#!/usr/bin/env python
+
+import iview
+import gtk
+import gobject
+import threading
+
+class Bootstrapper(threading.Thread):
+
+	def run(self):
+		global status
+
+		self.update_progress(0.0, 'Performing handshake')
+		iview.do_handshake()
+		iview.get_programme(self.update_progress)
+
+		gtk.gdk.threads_enter()
+		populate_lists()
+		gtk.gdk.threads_leave()
+
+	def stop(self):
+		pass
+
+	def update_progress(self, amount=None, message=''):
+		gtk.gdk.threads_enter()
+		if amount == None:
+			status.set_fraction(0.0)
+			status.set_text('')
+			status.hide()
+		else:
+			status.show()
+			amount = status.get_fraction() + amount
+			if amount > 1.0:
+				amount = 1.0
+			status.set_fraction(amount)
+			status.set_text(message)
+		gtk.gdk.threads_leave()
+
+def populate_lists():
+	splash.hide()
+
+	treestore = gtk.TreeStore(str, str)
+	for channel in iview.comm.programme.iteritems():
+		c = treestore.append(None, [channel[0], False])
+		for program in channel[1]:
+			treestore.append(c, [program['title'], program['url']])
+
+	tvcolumn = gtk.TreeViewColumn('Program Name')
+	listing.append_column(tvcolumn)
+	cell = gtk.CellRendererText()
+	tvcolumn.pack_start(cell, True)
+	tvcolumn.add_attribute(cell, 'text', 0)
+
+	listing.set_model(treestore)
+
+	window.show_all()
+
+gtk.gdk.threads_init()
+
+window = gtk.Window()
+window.set_title('iView')
+window.set_border_width(10)
+window.set_default_size(300,450)
+window.connect('destroy', gtk.main_quit)
+
+vbox = gtk.VBox()
+
+programme_label = gtk.Label()
+programme_label.set_markup("<big><b>iView Programme</b></big>")
+vbox.pack_start(programme_label, expand=False)
+
+listing_scroller = gtk.ScrolledWindow()
+listing_scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+
+listing = gtk.TreeView(None)
+listing.set_headers_visible(False)
+
+listing_scroller.add(listing)
+vbox.pack_start(listing_scroller)
+
+window.add(vbox)
+
+splash = gtk.Window()
+splash.set_title("iView Loading")
+splash.set_border_width(10)
+splash.set_resizable(False)
+splash.connect('destroy', gtk.main_quit)
+
+status = gtk.ProgressBar()
+splash.add(status)
+
+splash.show_all()
+
+Bootstrapper().start()
+gtk.main()
