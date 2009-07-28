@@ -4,6 +4,7 @@ import iview
 import gtk
 import gobject
 import threading
+import sys
 
 class Bootstrapper(threading.Thread):
 
@@ -15,7 +16,7 @@ class Bootstrapper(threading.Thread):
 		iview.get_programme(self.update_progress)
 
 		gtk.gdk.threads_enter()
-		populate_lists()
+		populate_programme()
 		gtk.gdk.threads_leave()
 
 	def stop(self):
@@ -23,21 +24,32 @@ class Bootstrapper(threading.Thread):
 
 	def update_progress(self, amount=None, message=''):
 		gtk.gdk.threads_enter()
+		programme_status.update_progress(amount, message)
+		gtk.gdk.threads_leave()
+
+class Splash(gtk.Window):
+	def __init__(self):
+		gtk.Window.__init__(self)
+
+		self.set_border_width(10)
+		self.set_resizable(False)
+
+		self.progressbar = gtk.ProgressBar()
+		self.add(self.progressbar)
+
+	def update_progress(self, amount=None, message=''):
 		if amount == None:
 			status.set_fraction(0.0)
 			status.set_text('')
-			status.hide()
 		else:
-			status.show()
-			amount = status.get_fraction() + amount
+			amount = self.progressbar.get_fraction() + amount
 			if amount > 1.0:
 				amount = 1.0
-			status.set_fraction(amount)
-			status.set_text(message)
-		gtk.gdk.threads_leave()
+			self.progressbar.set_fraction(amount)
+			self.progressbar.set_text(message)
 
-def populate_lists():
-	splash.hide()
+def populate_programme():
+	programme_status.destroy()
 
 	treestore = gtk.TreeStore(str, str)
 	for channel in iview.comm.programme.iteritems():
@@ -80,16 +92,12 @@ vbox.pack_start(listing_scroller)
 
 window.add(vbox)
 
-splash = gtk.Window()
-splash.set_title("iView Loading")
-splash.set_border_width(10)
-splash.set_resizable(False)
-splash.connect('destroy', gtk.main_quit)
+programme_status = Splash()
+programme_status.set_title("iView Loading")
+programme_status.show_all()
 
-status = gtk.ProgressBar()
-splash.add(status)
-
-splash.show_all()
+if sys.argv[1] in ('-c', '--cache'):
+	iview.comm.cache = True
 
 Bootstrapper().start()
 gtk.main()

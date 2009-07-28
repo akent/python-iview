@@ -2,8 +2,7 @@ import os
 import urllib
 import parser
 
-iview_base_url = 'http://www.abc.net.au/iview/'
-config_url = iview_base_url + 'iview_230_config.xml'
+config_url = 'http://www.abc.net.au/iview/iview_231_config.xml'
 cache = False
 
 auth = None
@@ -17,7 +16,7 @@ def fetch_url(url):
 	http = urllib.urlopen(url)
 
 	if http.getcode() != 200:
-		raise Exception()
+		raise Exception(url)
 
 	return http.read()
 

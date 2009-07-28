@@ -10,8 +10,11 @@ def parse_config(soup):
 	xml = BeautifulStoneSoup(soup)
 
 	return {
-		'auth_url' : xml.find('param', attrs={'name':'auth_path'})['value'],
-		'channels_url' : comm.iview_base_url + xml.find('param', attrs={'name':'xml_channels'})['value']
+		'auth_url' : xml.find('param', attrs={'name':'auth_path'}).get('value'),
+		'channels_url' : 
+			xml.find('param', attrs={'name':'base_url'}).get('value')
+			+ '/'
+			+ xml.find('param', attrs={'name':'xml_channels'}).get('value')
 	}
 
 def parse_auth(soup):
@@ -45,7 +48,7 @@ def parse_channels(soup):
 	all_channels = xml.findAll("channel")
 
 	for channel in all_channels:
-		channels.append(channel['output'])
+		channels.append(channel['path'])
 
 	return channels
 
@@ -54,14 +57,25 @@ def append_channel(soup, programme):
 
 	listing = []
 
-	for program in xml('program-title'):
-		listing.append({
-			'title' : program.find('title').string,
-			'url'   : program.find('url').string.split('.flv')[0]
-			# we need to chop off the .flv off the end
-			# as that's the way we need to give it to
-			# the RTMP server for some reason
-		})
+	for series in xml.findAll('series'):
+		series_url = series.get('href')
 
-	programme[xml.find('name').string] = listing
+		if series_url is None:
+			continue
+
+		# HACK: replace <abc: with < because BeautifulSoup doesn't have
+		# any (obvious) way to inspect inside namespaces.
+		series_soup = comm.maybe_fetch(series_url).replace('<abc:', '<').replace('</abc:', '</')
+		series_xml = BeautifulStoneSoup(series_soup)
+
+		for program in series_xml.findAll('item'):
+			listing.append({
+				'title' : program.find('title').string,
+				'url'   : program.find('videoasset').string.split('.flv')[0]
+				# we need to chop off the .flv off the end
+				# as that's the way we need to give it to
+				# the RTMP server for some reason
+			})
+
+	programme[xml.find('title').string] = listing
 

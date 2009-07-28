@@ -33,7 +33,7 @@ def download(url):
 	iview.fetch.fetch_program(url, execvp=True)
 
 try:
-	opts, args = getopt.getopt(sys.argv[1:], 'd:psh', ['download=', 'programme', 'program', 'handshake', 'help'])
+	opts, args = getopt.getopt(sys.argv[1:], 'cd:psh', ['cache', 'download=', 'programme', 'program', 'handshake', 'help'])
 	if not len(opts) > 0:
 		raise getopt.GetoptError('Not enough arguments')
 except getopt.GetoptError, err:
@@ -41,6 +41,8 @@ except getopt.GetoptError, err:
 	sys.exit(2)
 
 for o, a in opts:
+	if o in ('-c', '--cache'):
+		iview.comm.cache = True
 	if o in ('-p', '--programme', '--program'):
 		programme()
 	elif o in ('-s', '--handshake'):
