@@ -49,22 +49,45 @@ class Splash(gtk.Window):
 			self.progressbar.set_fraction(amount)
 			self.progressbar.set_text(message)
 
+def about(widget, data=None):
+	d = gtk.AboutDialog()
+
+	d.set_version(iview.version())
+	d.set_copyright('Copyright \302\251 2009 by Jeremy Visser')
+	d.set_license("""This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.""")
+
+	d.run()
+	d.destroy()
+
 gtk.gdk.threads_init()
 
 window = gtk.Window()
 window.set_title('iView')
-window.set_border_width(10)
 window.set_default_size(300,450)
+window.set_border_width(5)
 window.connect('destroy', gtk.main_quit)
 
 vbox = gtk.VBox()
 
 programme_label = gtk.Label()
 programme_label.set_markup("<big><b>iView Programme</b></big>")
+
 vbox.pack_start(programme_label, expand=False)
 
 listing_scroller = gtk.ScrolledWindow()
 listing_scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+listing_scroller.set_shadow_type(gtk.SHADOW_IN)
 
 listing = gtk.TreeView(iview.programme)
 tvcolumn = gtk.TreeViewColumn('Program Name')
@@ -74,8 +97,23 @@ tvcolumn.pack_start(cell, True)
 tvcolumn.add_attribute(cell, 'text', 0)
 listing.set_headers_visible(False)
 
+listing_scroller.set_border_width(5)
+
 listing_scroller.add(listing)
 vbox.pack_start(listing_scroller)
+
+bb = gtk.HButtonBox()
+bb.set_layout(gtk.BUTTONBOX_EDGE)
+bb.set_border_width(5)
+
+about_btn = gtk.Button(stock=gtk.STOCK_ABOUT)
+about_btn.connect('clicked', about)
+download_btn = gtk.Button('Download')
+
+bb.pack_start(about_btn)
+bb.pack_start(download_btn)
+
+vbox.pack_start(bb, expand=False)
 
 window.add(vbox)
 
