@@ -55,7 +55,7 @@ def parse_channels(soup):
 def append_channel(soup, programme):
 	xml = BeautifulStoneSoup(soup)
 
-	listing = []
+	channel_iter = programme.append(None, [xml.find('title').string, None])
 
 	for series in xml.findAll('series'):
 		series_url = series.get('href')
@@ -69,13 +69,10 @@ def append_channel(soup, programme):
 		series_xml = BeautifulStoneSoup(series_soup)
 
 		for program in series_xml.findAll('item'):
-			listing.append({
-				'title' : program.find('title').string,
-				'url'   : program.find('videoasset').string.split('.flv')[0]
-				# we need to chop off the .flv off the end
-				# as that's the way we need to give it to
-				# the RTMP server for some reason
-			})
-
-	programme[xml.find('title').string] = listing
-
+			programme.append(channel_iter, [
+					program.find('title').string,
+					program.find('videoasset').string.split('.flv')[0]
+					# we need to chop off the .flv off the end
+					# as that's the way we need to give it to
+					# the RTMP server for some reason
+				])

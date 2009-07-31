@@ -1,5 +1,6 @@
 import os
 import urllib
+import gtk
 import parser
 
 config_url = 'http://www.abc.net.au/iview/iview_231_config.xml'
@@ -7,7 +8,7 @@ cache = False
 
 auth = None
 channels = None
-programme = {}
+programme = gtk.TreeStore(str, str)
 
 def fetch_url(url):
 	"""	Simple function that fetches a URL using URLlib.

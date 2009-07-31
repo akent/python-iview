@@ -16,7 +16,8 @@ class Bootstrapper(threading.Thread):
 		iview.get_programme(self.update_progress)
 
 		gtk.gdk.threads_enter()
-		populate_programme()
+		programme_status.destroy()
+		window.show_all()
 		gtk.gdk.threads_leave()
 
 	def stop(self):
@@ -48,25 +49,6 @@ class Splash(gtk.Window):
 			self.progressbar.set_fraction(amount)
 			self.progressbar.set_text(message)
 
-def populate_programme():
-	programme_status.destroy()
-
-	treestore = gtk.TreeStore(str, str)
-	for channel in iview.comm.programme.iteritems():
-		c = treestore.append(None, [channel[0], False])
-		for program in channel[1]:
-			treestore.append(c, [program['title'], program['url']])
-
-	tvcolumn = gtk.TreeViewColumn('Program Name')
-	listing.append_column(tvcolumn)
-	cell = gtk.CellRendererText()
-	tvcolumn.pack_start(cell, True)
-	tvcolumn.add_attribute(cell, 'text', 0)
-
-	listing.set_model(treestore)
-
-	window.show_all()
-
 gtk.gdk.threads_init()
 
 window = gtk.Window()
@@ -84,7 +66,12 @@ vbox.pack_start(programme_label, expand=False)
 listing_scroller = gtk.ScrolledWindow()
 listing_scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 
-listing = gtk.TreeView(None)
+listing = gtk.TreeView(iview.programme)
+tvcolumn = gtk.TreeViewColumn('Program Name')
+listing.append_column(tvcolumn)
+cell = gtk.CellRendererText()
+tvcolumn.pack_start(cell, True)
+tvcolumn.add_attribute(cell, 'text', 0)
 listing.set_headers_visible(False)
 
 listing_scroller.add(listing)
