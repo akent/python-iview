@@ -14,10 +14,15 @@ def programme():
 	iview.do_handshake()
 	iview.get_programme()
 
-	for name, programs in iview.comm.programme.iteritems():
-		print(name + ':')
-		for p in programs:
-			print('\t' + p['title'] + '\t(' + p['url'] + ')')
+	from iview import programme
+	channel = programme.get_iter_root()
+	while not channel is None:
+		print(programme.get(channel, 0)[0] + ':')
+		program = programme.iter_children(channel)
+		while not program is None:
+			print('\t' + programme.get(program, 0)[0] + '\t(' + programme.get(program, 1)[0] + ')')
+			program = programme.iter_next(program)
+		channel = programme.iter_next(channel)
 
 def handshake():
 	iview.do_handshake()
