@@ -63,8 +63,9 @@ def do_handshake():
 	channels = parser.parse_channels(maybe_fetch(config['channels_url']))
 
 def get_programme(progress=None):
-	"""	This function pulls the actual channel XML files, which contain the TV
-		programs. The actual XML is parsed in the 'parser' module.
+	"""	This function pulls the actual channel XML files, which contain
+		pointers to the TV programs ('series'). The actual XML is parsed
+		in the 'parser' module.
 	"""
 
 	global programme
@@ -77,6 +78,6 @@ def get_programme(progress=None):
 			channel_xml = maybe_fetch(channel[1])
 			parser.append_channel(channel_xml, programme)
 		except IOError:
-			print 'Warning: unable to fetch', channel
+			print 'Warning: unable to fetch', channel[1]
 			pass
 

@@ -63,10 +63,16 @@ def append_channel(soup, programme):
 		if series_url is None:
 			continue
 
-		# HACK: replace <abc: with < because BeautifulSoup doesn't have
-		# any (obvious) way to inspect inside namespaces.
-		series_soup = comm.maybe_fetch(series_url).replace('<abc:', '<').replace('</abc:', '</')
-		series_xml = BeautifulStoneSoup(series_soup)
+		try:
+			# HACK: replace <abc: with < because BeautifulSoup doesn't have
+			# any (obvious) way to inspect inside namespaces.
+			series_soup = comm.maybe_fetch(series_url) \
+				.replace('<abc:', '<') \
+				.replace('</abc:', '</')
+			series_xml = BeautifulStoneSoup(series_soup)
+		except IOError:
+			print 'Warning: unable to fetch', series_url
+			pass
 
 		for program in series_xml.findAll('item'):
 			programme.append(channel_iter, [

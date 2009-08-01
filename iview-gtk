@@ -54,6 +54,59 @@ class Splash(gtk.Window):
 			self.progressbar.set_fraction(amount)
 			self.progressbar.set_text(message)
 
+class Downloader(gtk.Window):
+	def __init__(self, url, title=None):
+		# This should return an object of type Popen
+		self.job = iview.fetch_program(url)
+		print(self.job)
+
+		gtk.Window.__init__(self)
+
+		if title is None:
+			title = url
+		self.set_title(title)
+		self.set_resizable(False)
+		self.set_default_size(400,0)
+		self.set_border_width(10)
+
+		vbox = gtk.VBox()
+
+		self.labels = []
+		for i in range(2):
+			row = gtk.HBox()
+			label_term = gtk.Label()
+			label_term.set_alignment(0., 0.5)
+			label_desc = gtk.Label()
+			label_desc.set_alignment(1., 0.5)
+			self.labels.append([label_term, label_desc])
+			row.pack_start(label_term)
+			row.pack_start(label_desc)
+			vbox.pack_start(row)
+
+		self.labels[0][0].set_text('Name')
+		self.labels[0][1].set_text(title)
+		self.labels[1][0].set_text('Filename')
+		self.labels[1][1].set_text(url.split('/')[1] + '.flv')
+
+		self.progress = gtk.ProgressBar()
+		vbox.pack_start(self.progress)
+
+		self.add(vbox)
+
+		self.show_all()
+
+	def on_destroy(self):
+		self.destroy()
+
+def on_download_clicked(widget, data=None):
+	model, selected_iter = listing.get_selection().get_selected()
+	if selected_iter is None:
+		return
+	item = model.get(selected_iter, 0, 1)
+	if item[1] is None:
+		return
+	Downloader(item[1], item[0])
+
 def about(widget, data=None):
 	d = gtk.AboutDialog()
 
@@ -95,12 +148,14 @@ listing_scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 listing_scroller.set_shadow_type(gtk.SHADOW_IN)
 
 listing = gtk.TreeView(iview.programme)
+listing.set_headers_visible(False)
+listing.get_selection().set_mode(gtk.SELECTION_SINGLE)
+
 tvcolumn = gtk.TreeViewColumn('Program Name')
 listing.append_column(tvcolumn)
 cell = gtk.CellRendererText()
 tvcolumn.pack_start(cell, True)
 tvcolumn.add_attribute(cell, 'text', 0)
-listing.set_headers_visible(False)
 
 listing_scroller.set_border_width(5)
 
@@ -114,6 +169,7 @@ bb.set_border_width(5)
 about_btn = gtk.Button(stock=gtk.STOCK_ABOUT)
 about_btn.connect('clicked', about)
 download_btn = gtk.Button('Download')
+download_btn.connect('clicked', on_download_clicked)
 
 bb.pack_start(about_btn)
 bb.pack_start(download_btn)

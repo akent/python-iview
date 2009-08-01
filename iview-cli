@@ -35,7 +35,7 @@ def handshake():
 
 def download(url):
 	iview.do_handshake()
-	iview.fetch.fetch_program(url, execvp=True)
+	iview.fetch_program(url, execvp=True)
 
 try:
 	opts, args = getopt.getopt(sys.argv[1:], 'cd:psh', ['cache', 'download=', 'programme', 'program', 'handshake', 'help'])
