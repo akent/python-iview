@@ -6,7 +6,7 @@ import parser
 config_url = 'http://www.abc.net.au/iview/iview_231_config.xml'
 cache = False
 
-auth = None
+config = None
 channels = None
 programme = gtk.TreeStore(str, str)
 
@@ -56,11 +56,13 @@ def do_handshake():
 		and gives us a one-time token we need to use to speak RTSP with
 		ABC's servers, and tells us what the RTMP URL is.
 	"""
-	global config, auth, channels
+	global config, channels
 
 	config = parser.parse_config(maybe_fetch(config_url))
-	auth = parser.parse_auth(maybe_fetch(config['auth_url']))
 	channels = parser.parse_channels(maybe_fetch(config['channels_url']))
+
+def get_auth():
+	return parser.parse_auth(fetch_url(config['auth_url']))
 
 def get_programme(progress=None):
 	"""	This function pulls the actual channel XML files, which contain

@@ -7,7 +7,7 @@ def usage():
 	print("""usage:
 	-d, --download <url>	download a program
 	-p, --programme		print the iView programme (URL in parentheses)
-	-s, --handshake		print iView handshake (auth) information
+	-a, --auth		print iView auth information (for debugging purposes)
 	-h, --help		this page""")
 
 def programme():
@@ -24,10 +24,10 @@ def programme():
 			program = programme.iter_next(program)
 		channel = programme.iter_next(channel)
 
-def handshake():
+def print_auth():
 	iview.do_handshake()
 
-	from iview.comm import auth
+	auth = iview.comm.get_auth()
 	print 'iView auth data:'
 	print '\tToken:', auth['token']
 	print '\tRTMP URL:', auth['rtmp_url']

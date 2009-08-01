@@ -22,10 +22,11 @@ def flvstreamer_x86(rtmp_host, rtmp_app, rtmp_playpath, output_filename, resume=
 def fetch_program(url, execvp=False):
 	filename = url.split('/')[1] + '.flv'
 	resume = os.path.isfile(filename)
+	auth = comm.get_auth()
 
 	return flvstreamer_x86(
-			comm.auth['rtmp_host'],
-			comm.auth['rtmp_app'] + '?auth=' + comm.auth['token'],
+			auth['rtmp_host'],
+			auth['rtmp_app'] + '?auth=' + auth['token'],
 			url,
 			filename,
 			resume,
