@@ -121,8 +121,11 @@ programme_status = Splash()
 programme_status.set_title("iView Loading")
 programme_status.show_all()
 
-if sys.argv[1] in ('-c', '--cache'):
-	iview.comm.cache = True
+try:
+	if sys.argv[1] in ('-c', '--cache'):
+		iview.comm.cache = True
+except IndexError:
+	pass
 
 Bootstrapper().start()
 gtk.main()
