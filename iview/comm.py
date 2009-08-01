@@ -72,9 +72,9 @@ def get_programme(progress=None):
 	increment = 1.0 / len(channels)
 	for channel in channels:
 		if not progress is None:
-			progress(increment, channel.split('/')[-1])
+			progress(increment, channel[0])
 		try:
-			channel_xml = maybe_fetch(channel)
+			channel_xml = maybe_fetch(channel[1])
 			parser.append_channel(channel_xml, programme)
 		except IOError:
 			print 'Warning: unable to fetch', channel

@@ -48,7 +48,7 @@ def parse_channels(soup):
 	all_channels = xml.findAll("channel")
 
 	for channel in all_channels:
-		channels.append(channel['path'])
+		channels.append([channel.find('name').string, channel['path']])
 
 	return channels
 

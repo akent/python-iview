@@ -11,26 +11,31 @@ class Bootstrapper(threading.Thread):
 	def run(self):
 		global status
 
+		gtk.gdk.threads_enter()
+		self.programme_status = Splash('iView Loading')
+		self.programme_status.show_all()
+		gtk.gdk.threads_leave()
+
 		self.update_progress(0.0, 'Performing handshake')
 		iview.do_handshake()
 		iview.get_programme(self.update_progress)
 
 		gtk.gdk.threads_enter()
-		programme_status.destroy()
+		self.programme_status.destroy()
 		window.show_all()
 		gtk.gdk.threads_leave()
 
-	def stop(self):
-		pass
-
 	def update_progress(self, amount=None, message=''):
 		gtk.gdk.threads_enter()
-		programme_status.update_progress(amount, message)
+		self.programme_status.update_progress(amount, message)
 		gtk.gdk.threads_leave()
 
 class Splash(gtk.Window):
-	def __init__(self):
+	def __init__(self, title=None):
 		gtk.Window.__init__(self)
+
+		if not title is None:
+			self.set_title(title)
 
 		self.set_border_width(10)
 		self.set_resizable(False)
@@ -74,14 +79,14 @@ gtk.gdk.threads_init()
 
 window = gtk.Window()
 window.set_title('iView')
-window.set_default_size(300,450)
+window.set_default_size(400,450)
 window.set_border_width(5)
 window.connect('destroy', gtk.main_quit)
 
 vbox = gtk.VBox()
 
 programme_label = gtk.Label()
-programme_label.set_markup("<big><b>iView Programme</b></big>")
+programme_label.set_markup('<big><b>iView Programme</b></big>')
 
 vbox.pack_start(programme_label, expand=False)
 
@@ -116,10 +121,6 @@ bb.pack_start(download_btn)
 vbox.pack_start(bb, expand=False)
 
 window.add(vbox)
-
-programme_status = Splash()
-programme_status.set_title("iView Loading")
-programme_status.show_all()
 
 try:
 	if sys.argv[1] in ('-c', '--cache'):
