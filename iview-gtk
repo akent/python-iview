@@ -5,6 +5,32 @@ import gtk
 import gobject
 import threading
 import sys
+import re
+
+cr = '\015' # carriage return
+num_windows = 0
+
+def add_window():
+	global num_windows
+	num_windows += 1
+
+def del_window(widget=None):
+	global num_windows
+	num_windows -= 1
+	if num_windows == 0:
+		gtk.main_quit()
+
+def readupto(fh, upto):
+	"""	Reads up to (and not including) the character
+		specified by arg 'upto'.
+	"""
+	result = ''
+	while True:
+		char = fh.read(1)
+		if char == '' or char == upto:
+			return result
+		else:
+			result = ''.join((result,char))
 
 class Bootstrapper(threading.Thread):
 
@@ -54,13 +80,48 @@ class Splash(gtk.Window):
 			self.progressbar.set_fraction(amount)
 			self.progressbar.set_text(message)
 
+class DownloadWorker(threading.Thread):
+	def __init__(self, parent):
+		threading.Thread.__init__(self)
+		self.parent = parent
+
+	def run(self):
+		progress_pattern = re.compile(r'\d+\.\d%')
+		size_pattern = re.compile(r'\d+\.\d+ kB')
+
+		rate = 0
+
+		while True:
+			r = readupto(self.parent.job.stderr, cr)
+			if r == '': # i.e. EOF, the process has quit
+				break
+			progress_search = progress_pattern.search(r)
+			size_search = size_pattern.search(r)
+			if progress_search is not None:
+				p = float(progress_search.group()[:-1]) / 100. # [:-1] shaves the % off the end
+				gtk.gdk.threads_enter()
+				self.parent.progress.set_fraction(p)
+				gtk.gdk.threads_leave()
+			if size_search is not None:
+				gtk.gdk.threads_enter()
+				self.parent.labels[2][1] \
+					.set_text('%.1f' % (float(size_search.group()[:-3]) / 1024.) + ' MB')
+				gtk.gdk.threads_leave()
+			if progress_search is None and size_search is None:
+				print 'FLVStreamer:\t' + r
+
+		self.parent.progress.set_fraction(1.)
+		self.parent.progress.set_text('Download complete')
+
 class Downloader(gtk.Window):
 	def __init__(self, url, title=None):
-		# This should return an object of type Popen
 		self.job = iview.fetch_program(url)
-		print(self.job)
+		self.download_worker = DownloadWorker(self).start()
 
 		gtk.Window.__init__(self)
+		self.connect('destroy', del_window)
+		self.connect('destroy', self.on_destroy)
+		add_window()
 
 		if title is None:
 			title = url
@@ -72,7 +133,7 @@ class Downloader(gtk.Window):
 		vbox = gtk.VBox()
 
 		self.labels = []
-		for i in range(2):
+		for i in range(3):
 			row = gtk.HBox()
 			label_term = gtk.Label()
 			label_term.set_alignment(0., 0.5)
@@ -87,6 +148,8 @@ class Downloader(gtk.Window):
 		self.labels[0][1].set_text(title)
 		self.labels[1][0].set_text('Filename')
 		self.labels[1][1].set_text(url.split('/')[1] + '.flv')
+		self.labels[2][0].set_text('Download size')
+		self.labels[2][1].set_text('0.0 MB')
 
 		self.progress = gtk.ProgressBar()
 		vbox.pack_start(self.progress)
@@ -95,8 +158,8 @@ class Downloader(gtk.Window):
 
 		self.show_all()
 
-	def on_destroy(self):
-		self.destroy()
+	def on_destroy(self, widget=None):
+		self.job.terminate()
 
 def on_download_clicked(widget, data=None):
 	model, selected_iter = listing.get_selection().get_selected()
@@ -134,7 +197,8 @@ window = gtk.Window()
 window.set_title('iView')
 window.set_default_size(400,450)
 window.set_border_width(5)
-window.connect('destroy', gtk.main_quit)
+window.connect('destroy', del_window)
+add_window()
 
 vbox = gtk.VBox()
 
