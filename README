@@ -26,7 +26,8 @@ Installation
 
 1. Make sure Python 2.6 is installed and working.
 2. Make sure BeautifulSoup is installed in Python and working.
-3. Build FLVStreamer and copy flvstreamer_x86 to somewhere within $PATH (e.g. /usr/local/bin).
+3. Install FLVStreamer. If building from source, copy flvstreamer_x86 to
+   somewhere within your $PATH (e.g. /usr/local/bin).
 4. Either run ./iview-cli or ./iview-gtk.
 
 Usage
