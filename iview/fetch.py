@@ -14,13 +14,17 @@ def flvstreamer(rtmp_host, rtmp_app, rtmp_playpath, output_filename, resume=Fals
 	if resume:
 		args.append('--resume')
 
-	if execvp:
-		try:
-			os.execvp('flvstreamer_x86', args) # the upstream naming convention
-		except OSError:
-			os.execvp('flvstreamer', args)     # the Debian naming convention
-	else:
-		return subprocess.Popen(args, stderr=subprocess.PIPE)
+	try:
+		if execvp:
+			os.execvp(args[0], args)
+		else:
+			return subprocess.Popen(args, stderr=subprocess.PIPE)
+	except OSError:
+		args[0] = 'flvstreamer_x86'
+		if execvp:
+			os.execvp(args[0], args)
+		else:
+			return subprocess.Popen(args, stderr=subprocess.PIPE)
 
 def fetch_program(url, execvp=False):
 	filename = url.split('/')[1] + '.flv'

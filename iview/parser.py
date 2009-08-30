@@ -9,7 +9,14 @@ def parse_config(soup):
 
 	xml = BeautifulStoneSoup(soup)
 
+	# should look like "rtmp://cp53909.edgefcs.net/ondemand"
+	rtmp_url = xml.find('param', attrs={'name':'server_streaming'}).get('value')
+	rtmp_chunks = rtmp_url.split('/')
+
 	return {
+		'rtmp_url'  : rtmp_url,
+		'rtmp_host' : rtmp_chunks[2],
+		'rtmp_app'  : rtmp_chunks[3],
 		'auth_url' : xml.find('param', attrs={'name':'auth_path'}).get('value'),
 		'channels_url' : 
 			xml.find('param', attrs={'name':'base_url'}).get('value')
@@ -26,13 +33,23 @@ def parse_auth(soup):
 	xml = BeautifulStoneSoup(soup)
 
 	# should look like "rtmp://203.18.195.10/ondemand"
-	rtmp_url = xml.find("server").string
-	rtmp_chunks = rtmp_url.split('/')
+	rtmp_url = xml.find('server').string
+
+	if rtmp_url is not None:
+		# the ISP provides their own iView server, i.e. unmetered
+		rtmp_chunks = rtmp_url.split('/')
+		rtmp_host = rtmp_chunks[2]
+		rtmp_app = rtmp_chunks[3]
+	else:
+		# we are a bland generic ISP
+		rtmp_url = comm.config['rtmp_url']
+		rtmp_host = comm.config['rtmp_host']
+		rtmp_app = comm.config['rtmp_app']
 
 	return {
 		'rtmp_url'  : rtmp_url,
-		'rtmp_host' : rtmp_chunks[2],
-		'rtmp_app'  : rtmp_chunks[3],
+		'rtmp_host' : rtmp_host,
+		'rtmp_app'  : rtmp_app,
 		'token'     : xml.find("token").string,
 		'free'      : (xml.find("free").string == "yes")
 	}
