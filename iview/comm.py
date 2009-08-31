@@ -1,5 +1,5 @@
 import os
-import urllib
+import urllib2
 import gtk
 import parser
 
@@ -11,14 +11,10 @@ channels = None
 programme = gtk.TreeStore(str, str)
 
 def fetch_url(url):
-	"""	Simple function that fetches a URL using URLlib.
+	"""	Simple function that fetches a URL using urllib2.
+		An exception is raised if an error (e.g. 404) occurs.
 	"""
-
-	http = urllib.urlopen(url)
-
-	if http.getcode() != 200:
-		raise Exception(url)
-
+	http = urllib2.urlopen(url)
 	return http.read()
 
 def maybe_fetch(url):
