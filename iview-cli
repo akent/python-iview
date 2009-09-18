@@ -7,7 +7,7 @@ def usage():
 	print("""usage:
 	-d, --download <url>	download a program
 	-p, --programme		print the iView programme (URL in parentheses)
-	-a, --auth		print iView auth information (for debugging purposes)
+	-a, --print-auth	print iView auth information (for debugging purposes)
 	-h, --help		this page""")
 
 def programme():
