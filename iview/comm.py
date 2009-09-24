@@ -3,7 +3,7 @@ import urllib2
 import gtk
 import parser
 
-config_url = 'http://www.abc.net.au/iview/iview_231_config.xml'
+config_url = 'http://www.abc.net.au/iview/iview_239_config.xml'
 cache = False
 
 config = None
