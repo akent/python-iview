@@ -6,6 +6,7 @@ import gobject
 import threading
 import sys
 import re
+import urllib2
 
 cr = '\015' # carriage return
 num_windows = 0
@@ -43,7 +44,26 @@ class Bootstrapper(threading.Thread):
 		gtk.gdk.threads_leave()
 
 		self.update_progress(0.0, 'Performing handshake')
-		iview.do_handshake()
+		try:
+			iview.do_handshake()
+		except urllib2.HTTPError as error:
+			gtk.gdk.threads_enter()
+			message = gtk.MessageDialog(
+				parent=self.programme_status,
+				type=gtk.MESSAGE_ERROR,
+				buttons=gtk.BUTTONS_CLOSE)
+			message.set_markup('<big><b>Download failed</b></big>\n\n' \
+				'Could not retrieve an important configuration file from iView.' \
+				' Please make sure you are connected to the Internet.\n\n' \
+				'If iView works fine in your web browser, then the iView API' \
+				' has most likely changed. Try and find an updated version of this'
+				' program, or contact the author.\n\n' \
+				'URL: %s' % error.url)
+			message.run()
+			gtk.main_quit()
+			gtk.gdk.threads_leave()
+			return
+
 		iview.get_programme(self.update_progress)
 
 		gtk.gdk.threads_enter()
@@ -65,6 +85,7 @@ class Splash(gtk.Window):
 
 		self.set_border_width(10)
 		self.set_resizable(False)
+		self.set_deletable(False)
 
 		self.progressbar = gtk.ProgressBar()
 		self.add(self.progressbar)
@@ -108,7 +129,7 @@ class DownloadWorker(threading.Thread):
 					.set_text('%.1f' % (float(size_search.group()[:-3]) / 1024.) + ' MB')
 				gtk.gdk.threads_leave()
 			if progress_search is None and size_search is None:
-				print 'FLVStreamer:\t' + r
+				print 'Backend debug:\t' + r
 
 		self.parent.progress.set_fraction(1.)
 		self.parent.progress.set_text('Download complete')
@@ -173,7 +194,7 @@ def on_download_clicked(widget, data=None):
 def about(widget, data=None):
 	d = gtk.AboutDialog()
 
-	d.set_version(iview.version())
+	d.set_version(iview.version)
 	d.set_copyright('Copyright \302\251 2009 by Jeremy Visser')
 	d.set_license("""This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

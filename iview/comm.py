@@ -1,9 +1,10 @@
 import os
 import urllib2
 import gtk
+import config
 import parser
 
-config_url = 'http://www.abc.net.au/iview/iview_239_config.xml'
+config_url = 'http://www.abc.net.au/iview/iview_%d_config.xml' % config.api_version
 cache = False
 
 config = None
