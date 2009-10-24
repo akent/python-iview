@@ -38,7 +38,7 @@ def flvstreamer(rtmp_host, rtmp_app, rtmp_playpath, output_filename, resume=Fals
 		return
 
 def fetch_program(url, execvp=False):
-	filename = url.split('/')[1] + '.flv'
+	filename = url.split('/')[-1] + '.flv'
 	resume = os.path.isfile(filename)
 	auth = comm.get_auth()
 
