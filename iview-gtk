@@ -108,7 +108,7 @@ class DownloadWorker(threading.Thread):
 
 	def run(self):
 		progress_pattern = re.compile(r'\d+\.\d%')
-		size_pattern = re.compile(r'\d+\.\d+ kB')
+		size_pattern = re.compile(r'\d+\.\d+ kB', re.IGNORECASE)
 
 		rate = 0
 
