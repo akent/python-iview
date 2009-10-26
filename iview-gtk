@@ -168,7 +168,7 @@ class Downloader(gtk.Window):
 		self.labels[0][0].set_text('Name')
 		self.labels[0][1].set_text(title)
 		self.labels[1][0].set_text('Filename')
-		self.labels[1][1].set_text(url.split('/')[1] + '.flv')
+		self.labels[1][1].set_text(url.split('/')[-1] + '.flv')
 		self.labels[2][0].set_text('Download size')
 		self.labels[2][1].set_text('0.0 MB')
 
