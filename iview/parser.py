@@ -7,6 +7,8 @@ def parse_config(soup):
 		need.
 	"""
 
+	soup = soup.replace('&amp;', '&#38;')
+
 	xml = BeautifulStoneSoup(soup)
 
 	# should look like "rtmp://cp53909.edgefcs.net/ondemand"
@@ -72,7 +74,7 @@ def parse_channels(soup):
 def append_channel(soup, programme):
 	xml = BeautifulStoneSoup(soup)
 
-	channel_iter = programme.append(None, [xml.find('title').string, None])
+	channel_iter = programme.append(None, [xml.find('title').string, None, xml.find('description').string])
 
 	for series in xml.findAll('series'):
 		series_url = series.get('href')
@@ -86,6 +88,11 @@ def append_channel(soup, programme):
 			series_soup = comm.maybe_fetch(series_url) \
 				.replace('<abc:', '<') \
 				.replace('</abc:', '</')
+
+			# HACK: replace &amp; with &#38; because HTML entities aren't
+			# valid in plain XML, but the ABC doesn't know that.
+			series_soup = series_soup.replace('&amp;', '&#38;')
+
 			series_xml = BeautifulStoneSoup(series_soup)
 		except IOError:
 			print 'Warning: unable to fetch', series_url
@@ -94,8 +101,9 @@ def append_channel(soup, programme):
 		for program in series_xml.findAll('item'):
 			programme.append(channel_iter, [
 					program.find('title').string,
-					program.find('videoasset').string.split('.flv')[0]
+					program.find('videoasset').string.split('.flv')[0],
 					# we need to chop off the .flv off the end
 					# as that's the way we need to give it to
 					# the RTMP server for some reason
+					program.find('description').string,
 				])

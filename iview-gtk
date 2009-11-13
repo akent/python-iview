@@ -191,6 +191,18 @@ def on_download_clicked(widget, data=None):
 		return
 	Downloader(item[1], item[0])
 
+def on_listing_cursor_changed(widget):
+	global description
+
+	model, selected_iter = listing.get_selection().get_selected()
+	if selected_iter is None:
+		return
+	item = model.get(selected_iter, 0, 1, 2)
+	if item[1] is None:
+		return
+
+	description.set_text(item[2])
+
 def about(widget, data=None):
 	d = gtk.AboutDialog()
 
@@ -235,6 +247,7 @@ listing_scroller.set_shadow_type(gtk.SHADOW_IN)
 listing = gtk.TreeView(iview.programme)
 listing.set_headers_visible(False)
 listing.get_selection().set_mode(gtk.SELECTION_SINGLE)
+listing.connect('cursor-changed', on_listing_cursor_changed)
 
 tvcolumn = gtk.TreeViewColumn('Program Name')
 listing.append_column(tvcolumn)
@@ -246,6 +259,10 @@ listing_scroller.set_border_width(5)
 
 listing_scroller.add(listing)
 vbox.pack_start(listing_scroller)
+
+description = gtk.Label()
+description.set_line_wrap(True)
+vbox.pack_start(description, expand=False)
 
 bb = gtk.HButtonBox()
 bb.set_layout(gtk.BUTTONBOX_EDGE)

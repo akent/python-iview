@@ -9,7 +9,9 @@ cache = False
 
 config = None
 channels = None
-programme = gtk.TreeStore(str, str)
+
+# name, url, description
+programme = gtk.TreeStore(str, str, str)
 
 def fetch_url(url):
 	"""	Simple function that fetches a URL using urllib2.
