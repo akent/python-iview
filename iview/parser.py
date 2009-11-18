@@ -1,3 +1,4 @@
+import gtk
 import comm
 from BeautifulSoup import BeautifulStoneSoup
 
@@ -74,7 +75,9 @@ def parse_channels(soup):
 def append_channel(soup, programme):
 	xml = BeautifulStoneSoup(soup)
 
+	gtk.gdk.threads_enter()
 	channel_iter = programme.append(None, [xml.find('title').string, None, xml.find('description').string])
+	gtk.gdk.threads_leave()
 
 	for series in xml.findAll('series'):
 		series_url = series.get('href')
@@ -98,6 +101,7 @@ def append_channel(soup, programme):
 			print 'Warning: unable to fetch', series_url
 			pass
 
+		gtk.gdk.threads_enter()
 		for program in series_xml.findAll('item'):
 			programme.append(channel_iter, [
 					program.find('title').string,
@@ -107,3 +111,5 @@ def append_channel(soup, programme):
 					# the RTMP server for some reason
 					program.find('description').string,
 				])
+		gtk.gdk.threads_leave()
+

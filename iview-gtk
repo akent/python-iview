@@ -33,23 +33,15 @@ def readupto(fh, upto):
 		else:
 			result = ''.join((result,char))
 
-class Bootstrapper(threading.Thread):
+class ProgrammeDownloader(threading.Thread):
 
 	def run(self):
-		global status
-
-		gtk.gdk.threads_enter()
-		self.programme_status = Splash('iView Loading')
-		self.programme_status.show_all()
-		gtk.gdk.threads_leave()
-
-		self.update_progress(0.0, 'Performing handshake')
 		try:
 			iview.do_handshake()
 		except urllib2.HTTPError as error:
 			gtk.gdk.threads_enter()
 			message = gtk.MessageDialog(
-				parent=self.programme_status,
+				parent=window,
 				type=gtk.MESSAGE_ERROR,
 				buttons=gtk.BUTTONS_CLOSE)
 			message.set_markup('<big><b>Download failed</b></big>\n\n' \
@@ -64,42 +56,7 @@ class Bootstrapper(threading.Thread):
 			gtk.gdk.threads_leave()
 			return
 
-		iview.get_programme(self.update_progress)
-
-		gtk.gdk.threads_enter()
-		self.programme_status.destroy()
-		window.show_all()
-		gtk.gdk.threads_leave()
-
-	def update_progress(self, amount=None, message=''):
-		gtk.gdk.threads_enter()
-		self.programme_status.update_progress(amount, message)
-		gtk.gdk.threads_leave()
-
-class Splash(gtk.Window):
-	def __init__(self, title=None):
-		gtk.Window.__init__(self)
-
-		if not title is None:
-			self.set_title(title)
-
-		self.set_border_width(10)
-		self.set_resizable(False)
-		self.set_deletable(False)
-
-		self.progressbar = gtk.ProgressBar()
-		self.add(self.progressbar)
-
-	def update_progress(self, amount=None, message=''):
-		if amount == None:
-			status.set_fraction(0.0)
-			status.set_text('')
-		else:
-			amount = self.progressbar.get_fraction() + amount
-			if amount > 1.0:
-				amount = 1.0
-			self.progressbar.set_fraction(amount)
-			self.progressbar.set_text(message)
+		iview.get_programme()
 
 class DownloadWorker(threading.Thread):
 	def __init__(self, parent):
@@ -280,11 +237,13 @@ vbox.pack_start(bb, expand=False)
 
 window.add(vbox)
 
+window.show_all()
+
 try:
 	if sys.argv[1] in ('-c', '--cache'):
 		iview.comm.cache = True
 except IndexError:
 	pass
 
-Bootstrapper().start()
+ProgrammeDownloader().start()
 gtk.main()
