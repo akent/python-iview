@@ -19,14 +19,14 @@ Requirements
 
 * Python 2.6 <http://www.python.org/>
 * BeautifulSoup <http://www.crummy.com/software/BeautifulSoup/>
-* FLVStreamer <http://savannah.nongnu.org/projects/flvstreamer/>
+* rtmpdump <http://lkcl.net/rtmp/>
 
 Installation
 ============
 
 1. Make sure Python 2.6 is installed and working.
 2. Make sure BeautifulSoup is installed in Python and working.
-3. Install FLVStreamer. If building from source, copy flvstreamer_x86 to
+3. Install rtmpdump. If building from source, copy rtmpdump_x86 to
    somewhere within your $PATH (e.g. /usr/local/bin).
 4. Either run ./iview-cli or ./iview-gtk.
 
@@ -38,7 +38,7 @@ Some usage examples are provided for your perusal.
 This is a purely informational command, and verifies that handshaking is
 working correctly.
 
-	$ ./iview-cli --handshake
+	$ ./iview-cli --print-auth
 	iView auth data:
 		Token: XXXXXXXXXXXXXXXXXXXX
 		RTMP URL: rtmp://203.18.195.10/ondemand
@@ -58,9 +58,9 @@ To actually download the program, use something like the following:
 
 	$ ./iview-cli --download news/730report_090716
 
-If FLVStreamer is all set up correctly, hopefully that will download
+If rtmpdump is all set up correctly, hopefully that will download
 an .flv file into your current directory, appropriately named. If it
-didn't work, type "flvstreamer_x86" and see if it does anything. If
+didn't work, type "rtmpdump_x86" and see if it does anything. If
 not, install it, or put it somewhere on your $PATH.
 
 Hacking
