@@ -3,15 +3,15 @@ import urllib2
 import gtk
 import config
 import parser
+import rc4
 
-config_url = 'http://www.abc.net.au/iview/iview_%d_config.xml' % config.api_version
 cache = False
 
-config = None
+iview_config = None
 channels = None
 
-# name, url, description
-programme = gtk.TreeStore(str, str, str)
+# name, id, url, description
+programme = gtk.TreeStore(str, str, str, str)
 
 def fetch_url(url):
 	"""	Simple function that fetches a URL using urllib2.
@@ -55,27 +55,38 @@ def do_handshake():
 		and gives us a one-time token we need to use to speak RTSP with
 		ABC's servers, and tells us what the RTMP URL is.
 	"""
-	global config, channels
+	global iview_config, channels
 
-	config = parser.parse_config(maybe_fetch(config_url))
-	channels = parser.parse_channels(maybe_fetch(config['channels_url']))
+	iview_config = parser.parse_config(maybe_fetch(config.config_url))
 
 def get_auth():
-	return parser.parse_auth(fetch_url(config['auth_url']))
+	return parser.parse_auth(fetch_url(config.auth_url))
 
 def get_programme(progress=None):
-	"""	This function pulls the actual channel XML files, which contain
-		pointers to the TV programs ('series'). The actual XML is parsed
-		in the 'parser' module.
+	"""	This function pulls in the index, which contains the TV series
+		that are available to us. The index is possibly encrypted, so we
+		must decrypt it here before passing it to the parser.
 	"""
-
 	global programme
 
-	for channel in channels:
-		try:
-			channel_xml = maybe_fetch(channel[1])
-			parser.append_channel(channel_xml, programme)
-		except IOError:
-			print 'Warning: unable to fetch', channel[1]
-			pass
+	index_xml = maybe_fetch(iview_config['index_url'])
+
+	if config.use_encryption:
+		r = rc4.RC4(config.index_password)
+		# RC4 is bidirectional, no need to distinguish between 'encrypt'
+		# and 'decrypt'.
+		index_xml = r.engine_crypt(r.hex_to_str(index_xml))
+
+	index = parser.parse_index(index_xml, programme)
+
+def get_series_items(series_iter):
+	"""	This function fetches the series detail page for the selected series,
+		which contain the items (i.e. the actual episodes).
+	"""
+	global programme
+
+	series_id = programme.get(series_iter, 1)[0]
+
+	series_xml = maybe_fetch(config.series_url % series_id)
+	parser.parse_series_items(series_iter, series_xml, programme)
 

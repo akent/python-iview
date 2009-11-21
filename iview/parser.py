@@ -20,11 +20,8 @@ def parse_config(soup):
 		'rtmp_url'  : rtmp_url,
 		'rtmp_host' : rtmp_chunks[2],
 		'rtmp_app'  : rtmp_chunks[3],
-		'auth_url' : xml.find('param', attrs={'name':'auth_path'}).get('value'),
-		'channels_url' : 
-			xml.find('param', attrs={'name':'base_url'}).get('value')
-			+ '/'
-			+ xml.find('param', attrs={'name':'xml_channels'}).get('value')
+		'index_url' : xml.find('param', attrs={'name':'index'}).get('value'),
+		'categories_url' : xml.find('param', attrs={'name':'categories'}).get('value'),
 	}
 
 def parse_auth(soup):
@@ -45,9 +42,9 @@ def parse_auth(soup):
 		rtmp_app = rtmp_chunks[3]
 	else:
 		# we are a bland generic ISP
-		rtmp_url = comm.config['rtmp_url']
-		rtmp_host = comm.config['rtmp_host']
-		rtmp_app = comm.config['rtmp_app']
+		rtmp_url = comm.iview_config['rtmp_url']
+		rtmp_host = comm.iview_config['rtmp_host']
+		rtmp_app = comm.iview_config['rtmp_app']
 
 	return {
 		'rtmp_url'  : rtmp_url,
@@ -57,59 +54,39 @@ def parse_auth(soup):
 		'free'      : (xml.find("free").string == "yes")
 	}
 
-def parse_channels(soup):
-	"""	This function will grab the channels list, to be parsed
-		and fetched separately. Returns an array of URLs.
+def parse_index(soup, programme):
+	"""	This function parses the index, which is an overall listing
+		of all programs available in iView. The index is divided into
+		'series' and 'items'. Series are things like 'beached az', while
+		items are things like 'beached az Episode 8'.
 	"""
 	xml = BeautifulStoneSoup(soup)
 
-	channels = []
-
-	all_channels = xml.findAll("channel")
-
-	for channel in all_channels:
-		channels.append([channel.find('name').string, channel['path']])
-
-	return channels
-
-def append_channel(soup, programme):
-	xml = BeautifulStoneSoup(soup)
-
-	gtk.gdk.threads_enter()
-	channel_iter = programme.append(None, [xml.find('title').string, None, xml.find('description').string])
-	gtk.gdk.threads_leave()
-
 	for series in xml.findAll('series'):
-		series_url = series.get('href')
+		series_iter = programme.append(None, [series.find('title').string, series.get('id'), None, None])
+		programme.append(series_iter, ['Loading...', None, None, None])
 
-		if series_url is None:
-			continue
+def parse_series_items(series_iter, soup, programme):
+	# HACK: replace <abc: with < because BeautifulSoup doesn't have
+	# any (obvious) way to inspect inside namespaces.
+	soup = soup \
+		.replace('<abc:', '<') \
+		.replace('</abc:', '</')
 
-		try:
-			# HACK: replace <abc: with < because BeautifulSoup doesn't have
-			# any (obvious) way to inspect inside namespaces.
-			series_soup = comm.maybe_fetch(series_url) \
-				.replace('<abc:', '<') \
-				.replace('</abc:', '</')
+	# HACK: replace &amp; with &#38; because HTML entities aren't
+	# valid in plain XML, but the ABC doesn't know that.
+	soup = soup.replace('&amp;', '&#38;')
 
-			# HACK: replace &amp; with &#38; because HTML entities aren't
-			# valid in plain XML, but the ABC doesn't know that.
-			series_soup = series_soup.replace('&amp;', '&#38;')
+	series_xml = BeautifulStoneSoup(soup)
 
-			series_xml = BeautifulStoneSoup(series_soup)
-		except IOError:
-			print 'Warning: unable to fetch', series_url
-			pass
-
-		gtk.gdk.threads_enter()
-		for program in series_xml.findAll('item'):
-			programme.append(channel_iter, [
-					program.find('title').string,
-					program.find('videoasset').string.split('.flv')[0],
-					# we need to chop off the .flv off the end
-					# as that's the way we need to give it to
-					# the RTMP server for some reason
-					program.find('description').string,
-				])
-		gtk.gdk.threads_leave()
+	for program in series_xml.findAll('item'):
+		programme.append(series_iter, [
+				program.find('title').string,
+				None,
+				program.find('videoasset').string.split('.flv')[0],
+				# we need to chop off the .flv off the end
+				# as that's the way we need to give it to
+				# the RTMP server for some reason
+				program.find('description').string,
+			])
 

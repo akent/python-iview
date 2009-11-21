@@ -17,7 +17,7 @@ def handshake():
 		print 'Error: could not retrieve an important configuration file from iView.'
 		print 'Please make sure you are connected to the Internet.\n'
 		print 'If iView works fine in your web browser, the iView API has possibly changed.' \
-		       'Try to find an updated version of this program or contact the author.'
+		      'Try to find an updated version of this program or contact the author.'
 		print '\nDebug: could not load URL', error.url
 		sys.exit(1)
 
@@ -26,18 +26,22 @@ def programme():
 	iview.get_programme()
 
 	from iview import programme
-	channel = programme.get_iter_root()
-	while not channel is None:
-		print(programme.get(channel, 0)[0] + ':')
-		program = programme.iter_children(channel)
-		while not program is None:
-			print('\t' + programme.get(program, 0)[0] + '\t(' + programme.get(program, 1)[0] + ')')
-			program = programme.iter_next(program)
-		channel = programme.iter_next(channel)
+	series = programme.get_iter_root()
+	while not series is None:
+		print(programme.get(series, 0)[0] + ':')
+
+		# Remove initial "Loading..." item
+		item = programme.iter_children(series)
+		programme.remove(item)
+
+		iview.get_series_items(series)
+		item = programme.iter_children(series)
+		while not item is None:
+			print('\t' + programme.get(item, 0)[0] + '\t(' + programme.get(item, 2)[0] + ')')
+			item = programme.iter_next(item)
+		series = programme.iter_next(series)
 
 def print_auth():
-	handshake()
-
 	auth = iview.comm.get_auth()
 	print 'iView auth data:'
 	print '\tToken:', auth['token']
@@ -60,7 +64,10 @@ for o, a in opts:
 	if o in ('-c', '--cache'):
 		iview.comm.cache = True
 	if o in ('-p', '--programme', '--program'):
-		programme()
+		try:
+			programme()
+		except KeyboardInterrupt: # don't traceback on a Ctrl+C
+			pass
 	elif o in ('-a', '--print-auth'):
 		print_auth()
 	elif o in ('-d', '--download'):
