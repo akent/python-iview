@@ -19,9 +19,7 @@ def flvstreamer(rtmp_url, rtmp_host, rtmp_app, rtmp_playpath, output_filename, r
 			'--swfhash',  config.swf_hash,
 			'--swfsize',  config.swf_size,
 			'--swfUrl',   config.swf_url,
-			'--pageUrl',  config.page_url,
-			'--tcUrl',    rtmp_url,
-			'-V', # verbose
+		#	'-V', # verbose
 			'-o', output_filename
 		]
 
