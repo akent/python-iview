@@ -1,8 +1,12 @@
+import os
+
 version     = '0.2'
 api_version = 306
 
-config_url = 'http://www.abc.net.au/iview/xml/config.xml?r=%d&useragent=python-iview-%s' \
-	% (api_version, version)
+uname      = os.uname()
+user_agent = 'Python-iView %s (%s %s %s)' % (version, uname[0], uname[2], uname[4])
+
+config_url = 'http://www.abc.net.au/iview/xml/config.xml?r=%d' % api_version
 auth_url   = 'http://www2b.abc.net.au/iView/Services/iViewHandshaker.asmx/isp'
 series_url = 'http://www.abc.net.au/iview/api/series.htm?id=%s'
 
@@ -16,4 +20,4 @@ page_url    = 'http://www.abc.net.au/iview/'
 # Used for decrypting the obfuscated index.xml file -- uses the RC4 cipher
 index_password = 'wallace'
 
-use_encryption = True
+use_encryption = False

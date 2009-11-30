@@ -17,7 +17,7 @@ def fetch_url(url):
 	"""	Simple function that fetches a URL using urllib2.
 		An exception is raised if an error (e.g. 404) occurs.
 	"""
-	http = urllib2.urlopen(url)
+	http = urllib2.urlopen(urllib2.Request(url, None, {'User-Agent' : config.user_agent}))
 	return http.read()
 
 def maybe_fetch(url):
