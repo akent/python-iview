@@ -108,19 +108,21 @@ class Downloader(gtk.Window):
 		self.set_default_size(400,0)
 		self.set_border_width(10)
 
-		vbox = gtk.VBox()
+		xpadding = 5
+		ypadding = 2
+
+		table = gtk.Table(3, 3, homogeneous=False)
 
 		self.labels = []
 		for i in range(3):
-			row = gtk.HBox()
 			label_term = gtk.Label()
 			label_term.set_alignment(0., 0.5)
 			label_desc = gtk.Label()
 			label_desc.set_alignment(1., 0.5)
 			self.labels.append([label_term, label_desc])
-			row.pack_start(label_term)
-			row.pack_start(label_desc)
-			vbox.pack_start(row)
+
+			table.attach(label_term, 0,1, i,i+1, xpadding=xpadding, ypadding=ypadding)
+			table.attach(label_desc, 1,2, i,i+1, xpadding=xpadding, ypadding=ypadding)
 
 		self.labels[0][0].set_text('Name')
 		self.labels[0][1].set_text(title)
@@ -130,9 +132,9 @@ class Downloader(gtk.Window):
 		self.labels[2][1].set_text('0.0 MB')
 
 		self.progress = gtk.ProgressBar()
-		vbox.pack_start(self.progress)
+		table.attach(self.progress, 0,2, 3,4, xpadding=xpadding, ypadding=8)
 
-		self.add(vbox)
+		self.add(table)
 
 		self.show_all()
 
