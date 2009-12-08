@@ -37,7 +37,7 @@ class ProgrammeDownloader(threading.Thread):
 
 	def run(self):
 		try:
-			iview.do_handshake()
+			iview.get_config()
 		except urllib2.HTTPError as error:
 			gtk.gdk.threads_enter()
 			message = gtk.MessageDialog(

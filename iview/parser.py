@@ -42,6 +42,10 @@ def parse_auth(soup):
 		rtmp_app = rtmp_chunks[3]
 	else:
 		# we are a bland generic ISP
+
+		if not comm.iview_config:
+			comm.get_config()
+
 		rtmp_url = comm.iview_config['rtmp_url']
 		rtmp_host = comm.iview_config['rtmp_host']
 		rtmp_app = comm.iview_config['rtmp_app']

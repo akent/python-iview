@@ -10,9 +10,9 @@ def usage():
 	-a, --print-auth	print iView auth information (for debugging purposes)
 	-h, --help		this page""")
 
-def handshake():
+def config():
 	try:
-		iview.do_handshake()
+		iview.get_config()
 	except urllib2.HTTPError as error:
 		print 'Error: could not retrieve an important configuration file from iView.'
 		print 'Please make sure you are connected to the Internet.\n'
@@ -22,7 +22,7 @@ def handshake():
 		sys.exit(1)
 
 def programme():
-	handshake()
+	config()
 	iview.get_programme()
 
 	from iview import programme
@@ -49,7 +49,7 @@ def print_auth():
 	print '\tUnmetered:', str(auth['free'])
 
 def download(url):
-	handshake()
+	config()
 	iview.fetch_program(url, execvp=True)
 
 try:

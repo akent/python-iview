@@ -1,7 +1,7 @@
 import os
 
 version     = '0.2'
-api_version = 315
+api_version = 317
 
 uname      = os.uname()
 user_agent = 'Python-iView %s (%s %s %s)' % (version, uname[0], uname[2], uname[4])

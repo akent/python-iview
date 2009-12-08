@@ -49,17 +49,21 @@ def maybe_fetch(url):
 
 	return data
 
-def do_handshake():
-	""" This function performs the initial handshake with iView.
-		Among other things, it tells us if the connection is unmetered,
-		and gives us a one-time token we need to use to speak RTSP with
-		ABC's servers, and tells us what the RTMP URL is.
+def get_config():
+	"""	This function fetches the iView "config". Among other things,
+		it tells us an always-metered "fallback" RTMP server, and points
+		us to many of iView's other XML files.
 	"""
 	global iview_config, channels
 
 	iview_config = parser.parse_config(maybe_fetch(config.config_url))
 
 def get_auth():
+	""" This function performs an authentication handshake with iView.
+		Among other things, it tells us if the connection is unmetered,
+		and gives us a one-time token we need to use to speak RTSP with
+		ABC's servers, and tells us what the RTMP URL is.
+	"""
 	return parser.parse_auth(fetch_url(config.auth_url))
 
 def get_programme(progress=None):
