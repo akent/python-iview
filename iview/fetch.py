@@ -3,7 +3,7 @@ import comm
 import os
 import subprocess
 
-def flvstreamer(rtmp_url, rtmp_host, rtmp_app, rtmp_playpath, output_filename, resume=False, execvp=False):
+def rtmpdump(rtmp_url, rtmp_host, rtmp_app, rtmp_playpath, output_filename, resume=False, execvp=False):
 	executables = (
 			'rtmpdump',
 			'rtmpdump_x86',
@@ -44,7 +44,7 @@ def fetch_program(url, execvp=False):
 	resume = os.path.isfile(filename)
 	auth = comm.get_auth()
 
-	return flvstreamer(
+	return rtmpdump(
 			auth['rtmp_url'],
 			auth['rtmp_host'],
 			auth['rtmp_app'] + '?auth=' + auth['token'],

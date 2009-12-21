@@ -33,7 +33,7 @@ def maybe_fetch(url):
 	if not os.path.isdir('cache'):
 		os.mkdir('cache')
 
-	filename = os.path.join('cache', url.split('/').pop())
+	filename = os.path.join('cache', url.split('/')[-1])
 
 	if os.path.isfile(filename):
 		f = open(filename, 'r')

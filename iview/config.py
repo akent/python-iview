@@ -1,10 +1,16 @@
 import os
 
 version     = '0.2'
-api_version = 317
+api_version = 320
 
-uname      = os.uname()
-user_agent = 'Python-iView %s (%s %s %s)' % (version, uname[0], uname[2], uname[4])
+# os.uname() is not available on Windows, so we make this optional.
+try:
+	uname = os.uname()
+	os_string = ' (%s %s %s)' % (uname[0], uname[2], uname[4])
+except AttributeError:
+	os_string = ''
+
+user_agent = 'Python-iView %s%s' % (version, os_string)
 
 config_url = 'http://www.abc.net.au/iview/xml/config.xml?r=%d' % api_version
 auth_url   = 'http://www2b.abc.net.au/iView/Services/iViewHandshaker.asmx/isp'
