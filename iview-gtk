@@ -33,31 +33,6 @@ def readupto(fh, upto):
 		else:
 			result = ''.join((result,char))
 
-class ProgrammeDownloader(threading.Thread):
-
-	def run(self):
-		try:
-			iview.get_config()
-		except urllib2.HTTPError as error:
-			gtk.gdk.threads_enter()
-			message = gtk.MessageDialog(
-				parent=window,
-				type=gtk.MESSAGE_ERROR,
-				buttons=gtk.BUTTONS_CLOSE)
-			message.set_markup('<big><b>Download failed</b></big>\n\n' \
-				'Could not retrieve an important configuration file from iView.' \
-				' Please make sure you are connected to the Internet.\n\n' \
-				'If iView works fine in your web browser, then the iView API' \
-				' has most likely changed. Try and find an updated version of this'
-				' program, or contact the author.\n\n' \
-				'URL: %s' % error.url)
-			message.run()
-			gtk.main_quit()
-			gtk.gdk.threads_leave()
-			return
-
-		iview.get_programme()
-
 class DownloadWorker(threading.Thread):
 	def __init__(self, parent):
 		threading.Thread.__init__(self)
@@ -257,13 +232,30 @@ vbox.pack_start(bb, expand=False)
 
 window.add(vbox)
 
-window.show_all()
-
 try:
 	if sys.argv[1] in ('-c', '--cache'):
 		iview.comm.cache = True
 except IndexError:
 	pass
 
-ProgrammeDownloader().start()
+try:
+	iview.get_config()
+	iview.get_programme()
+except urllib2.HTTPError as error:
+	message = gtk.MessageDialog(
+		parent=window,
+		type=gtk.MESSAGE_ERROR,
+		buttons=gtk.BUTTONS_CLOSE)
+	message.set_markup('<big><b>Download failed</b></big>\n\n' \
+		'Could not retrieve an important configuration file from iView.' \
+		' Please make sure you are connected to the Internet.\n\n' \
+		'If iView works fine in your web browser, then the iView API' \
+		' has most likely changed. Try and find an updated version of this'
+		' program, or contact the author.\n\n' \
+		'URL: %s' % error.url)
+	message.run()
+	gtk.main_quit()
+	sys.exit(1)
+
+window.show_all()
 gtk.main()
