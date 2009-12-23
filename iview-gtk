@@ -134,7 +134,13 @@ class Downloader(gtk.Window):
 		self.progress = gtk.ProgressBar()
 		table.attach(self.progress, 0,2, 3,4, xpadding=xpadding, ypadding=8)
 
-		self.add(table)
+		close_btn = gtk.Button(stock=gtk.STOCK_CLOSE)
+		close_btn.connect('clicked', del_window)
+
+		vbox = gtk.VBox()
+		vbox.pack_start(table)
+		vbox.pack_start(close_btn, expand=False)
+		self.add(vbox)
 
 		self.show_all()
 
