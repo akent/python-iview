@@ -65,6 +65,7 @@ class DownloadWorker(threading.Thread):
 
 		self.parent.progress.set_fraction(1.)
 		self.parent.progress.set_text('Download complete')
+		self.parent.close_btn.set_label(gtk.STOCK_CLOSE)
 
 class Downloader(gtk.Window):
 	def __init__(self, url, title=None):
@@ -109,12 +110,27 @@ class Downloader(gtk.Window):
 		self.progress = gtk.ProgressBar()
 		table.attach(self.progress, 0,2, 3,4, xpadding=xpadding, ypadding=8)
 
-		self.add(table)
+		bb = gtk.HButtonBox()
+		bb.set_layout(gtk.BUTTONBOX_END)
+		self.close_btn = gtk.Button(stock=gtk.STOCK_STOP)
+		self.close_btn.connect('clicked', self.destroy)
+		bb.pack_end(self.close_btn)
+
+		vbox = gtk.VBox()
+		vbox.pack_start(table)
+		vbox.pack_start(bb, expand=False)
+		self.add(vbox)
 
 		self.show_all()
 
 	def on_destroy(self, widget=None):
 		self.job.terminate()
+
+	def destroy(self, null_param=None):
+		"""	Allow destroy() to be called with a parameter, thus allowing it to
+			be attached to the "clicked" event of a button.
+		"""
+		gtk.Window.destroy(self)
 
 def on_download_clicked(widget, data=None):
 	model, selected_iter = listing.get_selection().get_selected()
