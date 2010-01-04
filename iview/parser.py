@@ -50,11 +50,14 @@ def parse_auth(soup):
 		rtmp_host = comm.iview_config['rtmp_host']
 		rtmp_app = comm.iview_config['rtmp_app']
 
+	token = xml.find("token").string
+	token = token.replace('&amp;', '&') # work around BeautifulSoup bug
+
 	return {
 		'rtmp_url'  : rtmp_url,
 		'rtmp_host' : rtmp_host,
 		'rtmp_app'  : rtmp_app,
-		'token'     : xml.find("token").string,
+		'token'     : token,
 		'free'      : (xml.find("free").string == "yes")
 	}
 
