@@ -257,7 +257,7 @@ except IndexError:
 try:
 	iview.get_config()
 	iview.get_programme()
-except urllib2.HTTPError as error:
+except (urllib2.HTTPError, error):
 	message = gtk.MessageDialog(
 		parent=window,
 		type=gtk.MESSAGE_ERROR,
