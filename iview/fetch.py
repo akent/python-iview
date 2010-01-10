@@ -40,9 +40,16 @@ def rtmpdump(rtmp_url, rtmp_host, rtmp_app, rtmp_playpath, output_filename, resu
 		return
 
 def fetch_program(url, execvp=False):
-	filename = url.split('/')[-1] + '.flv'
+	filename = url.split('/')[-1]
 	resume = os.path.isfile(filename)
 	auth = comm.get_auth()
+
+	url = auth['playpath_prefix'] + url
+
+	if url.split('.')[-1] == 'mp4':
+		url = 'mp4:' + url
+
+	url = url.split('.')[0] # strip off the .flv or .mp4
 
 	return rtmpdump(
 			auth['rtmp_url'],

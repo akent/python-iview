@@ -35,16 +35,22 @@ def parse_auth(soup):
 	# should look like "rtmp://203.18.195.10/ondemand"
 	rtmp_url = xml.find('server').string
 
+	playpath_prefix = ''
+
 	if rtmp_url is not None:
-		# the ISP provides their own iView server, i.e. unmetered
+		# Being directed to a custom streaming server (i.e. for unmetered services).
+		# Currently this includes Hostworks for all unmetered ISPs except iiNet.
+
 		rtmp_chunks = rtmp_url.split('/')
 		rtmp_host = rtmp_chunks[2]
 		rtmp_app = rtmp_chunks[3]
 	else:
-		# we are a bland generic ISP
+		# We are a bland generic ISP using Akamai, or we are iiNet.
 
 		if not comm.iview_config:
 			comm.get_config()
+
+		playpath_prefix = config.akamai_playpath_prefix
 
 		rtmp_url = comm.iview_config['rtmp_url']
 		rtmp_host = comm.iview_config['rtmp_host']
@@ -54,11 +60,12 @@ def parse_auth(soup):
 	token = token.replace('&amp;', '&') # work around BeautifulSoup bug
 
 	return {
-		'rtmp_url'  : rtmp_url,
-		'rtmp_host' : rtmp_host,
-		'rtmp_app'  : rtmp_app,
-		'token'     : token,
-		'free'      : (xml.find("free").string == "yes")
+		'rtmp_url'        : rtmp_url,
+		'rtmp_host'       : rtmp_host,
+		'rtmp_app'        : rtmp_app,
+		'playpath_prefix' : playpath_prefix,
+		'token'           : token,
+		'free'            : (xml.find("free").string == "yes")
 	}
 
 def parse_index(soup, programme):
@@ -90,10 +97,7 @@ def parse_series_items(series_iter, soup, programme):
 		programme.append(series_iter, [
 				program.find('title').string,
 				None,
-				program.find('videoasset').string.split('.flv')[0],
-				# we need to chop off the .flv off the end
-				# as that's the way we need to give it to
-				# the RTMP server for some reason
+				program.find('videoasset').string,
 				program.find('description').string,
 			])
 
