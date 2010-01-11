@@ -13,7 +13,7 @@ def usage():
 def config():
 	try:
 		iview.get_config()
-	except (urllib2.HTTPError, error):
+	except urllib2.HTTPError, error:
 		print 'Error: could not retrieve an important configuration file from iView.'
 		print 'Please make sure you are connected to the Internet.\n'
 		print 'If iView works fine in your web browser, the iView API has possibly changed.' \

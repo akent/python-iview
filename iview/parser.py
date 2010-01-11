@@ -1,5 +1,6 @@
 import gtk
 import comm
+import config
 from BeautifulSoup import BeautifulStoneSoup
 
 def parse_config(soup):
