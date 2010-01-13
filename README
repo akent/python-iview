@@ -1,5 +1,5 @@
 Python command-line and GTK+ interface to ABC iView
-Copyright (C) 2009 by Jeremy Visser <jeremy@visser.name>
+Copyright (C) 2009-2010 by Jeremy Visser <jeremy@visser.name>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,14 +17,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Requirements
 ============
 
-* Python 2.6 <http://www.python.org/>
+* Python 2.6 (recommended) or Python 2.5 <http://www.python.org/>
+  (Some Windows users report better compatibility with Python 2.5.)
 * BeautifulSoup <http://www.crummy.com/software/BeautifulSoup/>
 * rtmpdump <http://lkcl.net/rtmp/>
 
 Installation
 ============
 
-1. Make sure Python 2.6 is installed and working.
+1. Make sure Python is installed and working.
 2. Make sure BeautifulSoup is installed in Python and working.
 3. Install rtmpdump. If building from source, copy rtmpdump_x86 to
    somewhere within your $PATH (e.g. /usr/local/bin).
@@ -47,16 +48,16 @@ working correctly.
 This can be used to view the iView programme and find the program URL:
 
 	$ ./iview-cli --programme
-	ABC News:
-		7.30 Report 16/07/09	(news/730report_090716)
-		7.30 Report 15/07/09	(news/730report_090715)
-		7.30 Report 14/07/09	(news/730report_090714)
-		7.30 Report 13/07/09	(news/730report_090713)
+	7.30 Report:
+	    7.30 Report 12/01/10	(news/730report_100112.flv)
+	    7.30 Report 11/01/10	(news/730report_100111.flv)
+	    7.30 Report 07/01/10	(news/730report_100107.flv)
+	    7.30 Report 06/01/10	(news/730report_100106.flv)
 	[...]
 
 To actually download the program, use something like the following:
 
-	$ ./iview-cli --download news/730report_090716
+	$ ./iview-cli --download news/730report_100112.flv
 
 If rtmpdump is all set up correctly, hopefully that will download
 an .flv file into your current directory, appropriately named. If it

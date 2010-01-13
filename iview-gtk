@@ -173,7 +173,7 @@ def about(widget, data=None):
 	d = gtk.AboutDialog()
 
 	d.set_version(iview.version)
-	d.set_copyright('Copyright \302\251 2009 by Jeremy Visser')
+	d.set_copyright('Copyright \302\251 2009-2010 by Jeremy Visser')
 	d.set_license("""This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
