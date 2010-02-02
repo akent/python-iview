@@ -2,6 +2,7 @@ import gtk
 import comm
 import config
 from BeautifulSoup import BeautifulStoneSoup
+import json
 
 def parse_config(soup):
 	"""	There are lots of goodies in the config we get back from the ABC.
@@ -21,7 +22,7 @@ def parse_config(soup):
 		'rtmp_url'  : rtmp_url,
 		'rtmp_host' : rtmp_chunks[2],
 		'rtmp_app'  : rtmp_chunks[3],
-		'index_url' : xml.find('param', attrs={'name':'index'}).get('value'),
+		'api_url' : xml.find('param', attrs={'name':'api'}).get('value'),
 		'categories_url' : xml.find('param', attrs={'name':'categories'}).get('value'),
 	}
 
@@ -75,10 +76,10 @@ def parse_index(soup, programme):
 		'series' and 'items'. Series are things like 'beached az', while
 		items are things like 'beached az Episode 8'.
 	"""
-	xml = BeautifulStoneSoup(soup)
+	index = json.loads(soup)
 
-	for series in xml.findAll('series'):
-		series_iter = programme.append(None, [series.find('title').string, series.get('id'), None, None])
+	for series in index:
+		series_iter = programme.append(None, [series['title'], series['id'], None, None])
 		programme.append(series_iter, ['Loading...', None, None, None])
 
 def parse_series_items(series_iter, soup, programme):

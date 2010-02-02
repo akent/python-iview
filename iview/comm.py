@@ -73,15 +73,15 @@ def get_programme(progress=None):
 	"""
 	global programme
 
-	index_xml = maybe_fetch(iview_config['index_url'])
+	index_data = maybe_fetch(iview_config['api_url'] + '?index')
 
 	if config.use_encryption:
 		r = rc4.RC4(config.index_password)
 		# RC4 is bidirectional, no need to distinguish between 'encrypt'
 		# and 'decrypt'.
-		index_xml = r.engine_crypt(r.hex_to_str(index_xml))
+		index_data = r.engine_crypt(r.hex_to_str(index_data))
 
-	index = parser.parse_index(index_xml, programme)
+	index = parser.parse_index(index_data, programme)
 
 def get_series_items(series_iter):
 	"""	This function fetches the series detail page for the selected series,
