@@ -2,7 +2,10 @@ import gtk
 import comm
 import config
 from BeautifulSoup import BeautifulStoneSoup
-import json
+try:
+	import json
+except ImportError:
+	import simplejson as json
 
 def parse_config(soup):
 	"""	There are lots of goodies in the config we get back from the ABC.
