@@ -3,6 +3,9 @@ import comm
 import os
 import subprocess
 
+def get_filename(url):
+	return url.split('/')[-1]
+
 def rtmpdump(rtmp_url, rtmp_host, rtmp_app, rtmp_playpath, output_filename, resume=False, execvp=False):
 	executables = (
 			'rtmpdump',
@@ -39,9 +42,11 @@ def rtmpdump(rtmp_url, rtmp_host, rtmp_app, rtmp_playpath, output_filename, resu
 			continue
 		return
 
-def fetch_program(url, execvp=False):
-	filename = url.split('/')[-1]
-	resume = os.path.isfile(filename)
+def fetch_program(url, execvp=False, dest_file=None):
+	if dest_file is None:
+		dest_file = get_filename(url)
+
+	resume = os.path.isfile(dest_file)
 	auth = comm.get_auth()
 
 	url = auth['playpath_prefix'] + url
@@ -56,7 +61,7 @@ def fetch_program(url, execvp=False):
 			auth['rtmp_host'],
 			auth['rtmp_app'] + '?auth=' + auth['token'],
 			url,
-			filename,
+			dest_file,
 			resume,
 			execvp
 		)

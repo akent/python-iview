@@ -68,8 +68,8 @@ class DownloadWorker(threading.Thread):
 		self.parent.close_btn.set_label(gtk.STOCK_CLOSE)
 
 class Downloader(gtk.Window):
-	def __init__(self, url, title=None):
-		self.job = iview.fetch_program(url)
+	def __init__(self, url, title=None, dest_file=None):
+		self.job = iview.fetch_program(url, dest_file=dest_file)
 		self.download_worker = DownloadWorker(self).start()
 
 		gtk.Window.__init__(self)
@@ -103,7 +103,7 @@ class Downloader(gtk.Window):
 		self.labels[0][0].set_text('Name')
 		self.labels[0][1].set_text(title)
 		self.labels[1][0].set_text('Filename')
-		self.labels[1][1].set_text(url.split('/')[-1])
+		self.labels[1][1].set_text(iview.get_filename(url))
 		self.labels[2][0].set_text('Download size')
 		self.labels[2][1].set_text('0.0 MB')
 
@@ -133,13 +133,30 @@ class Downloader(gtk.Window):
 		gtk.Window.destroy(self)
 
 def on_download_clicked(widget, data=None):
+	global window
+
 	model, selected_iter = listing.get_selection().get_selected()
 	if selected_iter is None:
 		return
 	item = model.get(selected_iter, 0, 2)
 	if item[1] is None:
 		return
-	Downloader(item[1], item[0])
+
+	save_dialog = gtk.FileChooserDialog('Save Video',
+		parent=window,
+		action=gtk.FILE_CHOOSER_ACTION_SAVE,
+		buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+		         gtk.STOCK_SAVE, gtk.RESPONSE_OK))
+
+	save_dialog.set_current_name(iview.get_filename(item[1]))
+	save_response = save_dialog.run()
+	save_dialog.hide()
+
+	if save_response == gtk.RESPONSE_OK:
+		dest_file = save_dialog.get_filename()
+		Downloader(item[1], item[0], dest_file)
+
+	save_dialog.destroy()
 
 def on_listing_cursor_changed(widget):
 	global description
