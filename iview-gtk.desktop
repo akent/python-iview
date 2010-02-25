@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Python-iView
+Comment=Use ABC iView
+Exec=iview-gtk %U
+Terminal=false
+Type=Application
+Categories=GTK;Network;

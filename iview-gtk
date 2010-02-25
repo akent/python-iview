@@ -63,13 +63,27 @@ class DownloadWorker(threading.Thread):
 			if progress_search is None and size_search is None:
 				print 'Backend debug:\t' + r
 
+		gtk.gdk.threads_enter()
 		self.parent.progress.set_fraction(1.)
 		self.parent.progress.set_text('Download complete')
 		self.parent.close_btn.set_label(gtk.STOCK_CLOSE)
+		gtk.gdk.threads_leave()
 
 class Downloader(gtk.Window):
 	def __init__(self, url, title=None, dest_file=None):
 		self.job = iview.fetch_program(url, dest_file=dest_file)
+
+		if not self.job:
+			message = gtk.MessageDialog(
+				parent=None,
+				type=gtk.MESSAGE_ERROR,
+				buttons=gtk.BUTTONS_CLOSE)
+			message.set_markup('<big><b>Download backend failed</b></big>\n\n' \
+				'Either the download backend in question failed for some reason, or one could not be found with which to download iView programmes. Please check the README file for instructions on setting this up.')
+			message.run()
+			message.destroy()
+			return
+
 		self.download_worker = DownloadWorker(self).start()
 
 		gtk.Window.__init__(self)

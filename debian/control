@@ -1,0 +1,21 @@
+Source: python-iview
+Section: main
+Priority: extra
+Maintainer: Jeremy Visser <jeremy@visser.name>
+Build-Depends: debhelper (>= 7), cdbs
+Standards-Version: 3.8.1
+Homepage: http://jeremy.visser.name/python-iview/
+
+Package: python-iview
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, python2.6 | python2.5, python-beautifulsoup
+Recommends: rtmpdump
+Suggests: python-simplejson
+Description: GTK+–based frontend to ABC iView
+ The ABC iView service is a video-on-demand streaming service
+ by the Australian Broadcasting Corporation based on Adobe Flash.
+ .
+ Unfortunately, Adobe Flash is non-free software that also runs
+ slowly or not at all on certain platforms. Python-iView offers
+ an alternative interface to the iView service for users that
+ are inconvenienced or restricted by the Flash interface.

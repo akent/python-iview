@@ -40,7 +40,10 @@ def rtmpdump(rtmp_url, rtmp_host, rtmp_app, rtmp_playpath, output_filename, resu
 		except OSError:
 			print 'Could not load %s, trying another...' % exec_attempt
 			continue
-		return
+
+	print "It looks like you don't have a compatible downloader backend installed."
+	print "See the README file for more information about setting this up properly."
+	return False
 
 def fetch_program(url, execvp=False, dest_file=None):
 	if dest_file is None:

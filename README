@@ -21,6 +21,8 @@ Requirements
   (Some Windows users report better compatibility with Python 2.5.)
 * BeautifulSoup <http://www.crummy.com/software/BeautifulSoup/>
 * rtmpdump <http://lkcl.net/rtmp/>
+* simplejson <http://pypi.python.org/pypi/simplejson/>
+  (Only for Python 2.5 users -- same functionality is built-in to Python 2.6.)
 
 Installation
 ============
@@ -29,7 +31,8 @@ Installation
 2. Make sure BeautifulSoup is installed in Python and working.
 3. Install rtmpdump. If building from source, copy rtmpdump_x86 to
    somewhere within your $PATH (e.g. /usr/local/bin).
-4. Either run ./iview-cli or ./iview-gtk.
+4. If you are running Python 2.5, install simplejson.
+5. Either run ./iview-cli or ./iview-gtk.
 
 Usage
 =====
@@ -61,8 +64,8 @@ To actually download the program, use something like the following:
 
 If rtmpdump is all set up correctly, hopefully that will download
 an .flv file into your current directory, appropriately named. If it
-didn't work, type "rtmpdump_x86" and see if it does anything. If
-not, install it, or put it somewhere on your $PATH.
+didn't work, type "rtmpdump" or "rtmpdump_x86" and see if it does anything.
+If not, install it, or put it somewhere on your $PATH.
 
 Hacking
 =======
