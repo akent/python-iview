@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
-import iview
+import iview.config
+import iview.comm
+import iview.fetch
 import gtk
 import gobject
 import threading
@@ -71,7 +73,7 @@ class DownloadWorker(threading.Thread):
 
 class Downloader(gtk.Window):
 	def __init__(self, url, title=None, dest_file=None):
-		self.job = iview.fetch_program(url, dest_file=dest_file)
+		self.job = iview.fetch.fetch_program(url, dest_file=dest_file)
 
 		if not self.job:
 			message = gtk.MessageDialog(
@@ -117,7 +119,7 @@ class Downloader(gtk.Window):
 		self.labels[0][0].set_text('Name')
 		self.labels[0][1].set_text(title)
 		self.labels[1][0].set_text('Filename')
-		self.labels[1][1].set_text(iview.get_filename(url))
+		self.labels[1][1].set_text(iview.fetch.get_filename(url))
 		self.labels[2][0].set_text('Download size')
 		self.labels[2][1].set_text('0.0 MB')
 
@@ -162,7 +164,7 @@ def on_download_clicked(widget, data=None):
 		buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
 		         gtk.STOCK_SAVE, gtk.RESPONSE_OK))
 
-	save_dialog.set_current_name(iview.get_filename(item[1]))
+	save_dialog.set_current_name(iview.fetch.get_filename(item[1]))
 	save_response = save_dialog.run()
 	save_dialog.hide()
 
@@ -197,13 +199,13 @@ def load_series_items(widget, iter, path):
 		# Better pull out.
 		return
 
-	iview.get_series_items(iter)
+	iview.comm.get_series_items(iter)
 	model.remove(child)
 
 def about(widget, data=None):
 	d = gtk.AboutDialog()
 
-	d.set_version(iview.version)
+	d.set_version(iview.config.version)
 	d.set_copyright('Copyright \302\251 2009-2010 by Jeremy Visser')
 	d.set_license("""This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -241,7 +243,7 @@ listing_scroller = gtk.ScrolledWindow()
 listing_scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 listing_scroller.set_shadow_type(gtk.SHADOW_IN)
 
-listing = gtk.TreeView(iview.programme)
+listing = gtk.TreeView(iview.comm.programme)
 listing.set_headers_visible(False)
 listing.get_selection().set_mode(gtk.SELECTION_SINGLE)
 listing.connect('cursor-changed', on_listing_cursor_changed)
@@ -286,8 +288,8 @@ except IndexError:
 	pass
 
 try:
-	iview.get_config()
-	iview.get_programme()
+	iview.comm.get_config()
+	iview.comm.get_programme()
 except urllib2.HTTPError, error:
 	message = gtk.MessageDialog(
 		parent=window,
