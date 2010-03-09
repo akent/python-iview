@@ -26,7 +26,7 @@ def programme():
 	config()
 	iview.comm.get_programme()
 
-	from iview import programme
+	from iview.comm import programme
 	series = programme.get_iter_root()
 	while not series is None:
 		print(programme.get(series, 0)[0] + ':')
