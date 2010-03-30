@@ -73,7 +73,7 @@ def get_programme(progress=None):
 	"""
 	global programme
 
-	index_data = maybe_fetch(iview_config['api_url'] + '?index')
+	index_data = maybe_fetch(iview_config['api_url'] + 'seriesIndex')
 
 	if config.use_encryption:
 		r = rc4.RC4(config.index_password)
