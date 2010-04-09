@@ -14,7 +14,7 @@ user_agent = 'Python-iView %s%s' % (version, os_string)
 
 config_url = 'http://www.abc.net.au/iview/xml/config.xml?r=%d' % api_version
 auth_url   = 'http://www2b.abc.net.au/iView/Services/iViewHandshaker.asmx/isp'
-series_url = 'http://www.abc.net.au/iview/api/series.htm?id=%s'
+series_url = 'http://www.abc.net.au/iview/api/series_mrss.htm?id=%s'
 
 akamai_playpath_prefix = 'flash/playback/_definst_/'
 
