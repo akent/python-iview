@@ -81,6 +81,8 @@ def parse_index(soup, programme):
 	"""
 	index = json.loads(soup)
 
+	index.sort(key=lambda series: series[1])
+
 	for series in index:
 		series_iter = programme.append(None, [series[1], series[0], None, None])
 		programme.append(series_iter, ['Loading...', None, None, None])
