@@ -177,6 +177,7 @@ def on_download_clicked(widget, data=None):
 def on_listing_cursor_changed(widget):
 	global description
 
+	description.set_text('')
 	download_btn.set_sensitive(False)
 
 	model, selected_iter = listing.get_selection().get_selected()
