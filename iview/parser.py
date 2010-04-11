@@ -84,7 +84,12 @@ def parse_index(soup, programme):
 	index.sort(key=lambda series: series[1])
 
 	for series in index:
-		series_iter = programme.append(None, [series[1], series[0], None, None])
+		# HACK: replace &amp; with & because HTML entities don't make
+		# the slightest bit of sense inside a JSON structure.
+		title = series[1].replace('&amp;', '&')
+		series_id = series[0]
+
+		series_iter = programme.append(None, [title, series_id, None, None])
 		programme.append(series_iter, ['Loading...', None, None, None])
 
 def parse_series_items(series_iter, soup, programme):
@@ -94,9 +99,9 @@ def parse_series_items(series_iter, soup, programme):
 		.replace('<abc:', '<') \
 		.replace('</abc:', '</')
 
-	# HACK: replace &amp; with &#38; because HTML entities aren't
+	# HACK: replace &amp; with & because HTML entities aren't
 	# valid in plain XML, but the ABC doesn't know that.
-	soup = soup.replace('&amp;', '&#38;')
+	soup = soup.replace('&amp;', '&')
 
 	series_xml = BeautifulStoneSoup(soup)
 
