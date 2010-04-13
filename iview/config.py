@@ -1,7 +1,7 @@
 import os
 
 version     = '0.2'
-api_version = 341
+api_version = 346
 
 # os.uname() is not available on Windows, so we make this optional.
 try:
@@ -19,11 +19,10 @@ series_url = 'http://www.abc.net.au/iview/api/series_mrss.htm?id=%s'
 akamai_playpath_prefix = 'flash/playback/_definst_/'
 
 # Used for "SWF verification", a stream obfuscation technique
-swf_hash    = 'a3eddcc12a96169882f99522a0835e629ae544f2f0bbeb1de4a6ed72754ac965'
-swf_size    = '1774'
+swf_hash    = '96cc76f1d5385fb5cda6e2ce5c73323a399043d0bb6c687edd807e5c73c42b37'
+swf_size    = '2122'
 
-swf_url     = 'http://www.abc.net.au/iview/netConnectionWrapper.swf'
-page_url    = 'http://www.abc.net.au/iview/'
+swf_url     = 'http://www.abc.net.au/iview/images/iview.jpg'
 
 # Used for decrypting the obfuscated index.xml file -- uses the RC4 cipher
 index_password = 'wallace'
