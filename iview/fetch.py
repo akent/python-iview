@@ -4,7 +4,7 @@ import os
 import subprocess
 
 def get_filename(url):
-	return url.split('/')[-1]
+	return ''.join((url.split('/')[-1], '.flv'))
 
 def rtmpdump(rtmp_url, rtmp_host, rtmp_app, rtmp_playpath, output_filename, resume=False, execvp=False):
 	executables = (
@@ -53,11 +53,6 @@ def fetch_program(url, execvp=False, dest_file=None):
 	auth = comm.get_auth()
 
 	url = auth['playpath_prefix'] + url
-
-	if url.split('.')[-1] == 'mp4':
-		url = 'mp4:' + url
-
-	url = url.split('.')[0] # strip off the .flv or .mp4
 
 	return rtmpdump(
 			auth['rtmp_url'],

@@ -106,10 +106,14 @@ def parse_series_items(series_iter, soup, programme):
 	series_xml = BeautifulStoneSoup(soup)
 
 	for program in series_xml.findAll('item'):
+		videoasset = program.find('videoasset').string
+		url = '.'.join(videoasset.split('.')[:-1]) # strip the .flv or .mp4
+		if videoasset.split('.')[-1] == 'mp4':
+			url = ''.join(('mp4:', url))
 		programme.append(series_iter, [
 				program.find('title').string,
 				None,
-				program.find('videoasset').string,
+				url,
 				program.find('description').string,
 			])
 
