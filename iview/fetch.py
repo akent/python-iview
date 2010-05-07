@@ -4,7 +4,10 @@ import os
 import subprocess
 
 def get_filename(url):
-	return ''.join((url.split('/')[-1], '.flv'))
+	return ''.join((
+		url.split('mp4:')[-1].split('/')[-1],
+		'.flv',
+	))
 
 def rtmpdump(rtmp_url, rtmp_host, rtmp_app, rtmp_playpath, output_filename, resume=False, execvp=False):
 	executables = (
