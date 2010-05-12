@@ -65,28 +65,29 @@ class DownloadWorker(threading.Thread):
 			if progress_search is None and size_search is None:
 				print 'Backend debug:\t' + r
 
+		returncode = self.parent.job.wait()
+
 		gtk.gdk.threads_enter()
-		self.parent.progress.set_fraction(1.)
-		self.parent.progress.set_text('Download complete')
-		self.parent.close_btn.set_label(gtk.STOCK_CLOSE)
+
+		if returncode == 0: # EXIT_SUCCESS
+			self.parent.progress.set_fraction(1.)
+			self.parent.progress.set_text('Download finished')
+			self.parent.close_btn.set_label(gtk.STOCK_CLOSE)
+			self.parent.pause_btn.hide()
+			self.parent.resume_btn.hide()
+		else:
+			print 'Backend aborted with code %d (either it crashed, or you paused it)' % returncode
+			if returncode == 1: # connection timeout results in code 1
+				self.parent.progress.set_text('Download failed')
+			self.parent.pause_btn.hide()
+			self.parent.resume_btn.show()
+
 		gtk.gdk.threads_leave()
 
 class Downloader(gtk.Window):
 	def __init__(self, url, title=None, dest_file=None):
-		self.job = iview.fetch.fetch_program(url, dest_file=dest_file)
-
-		if not self.job:
-			message = gtk.MessageDialog(
-				parent=None,
-				type=gtk.MESSAGE_ERROR,
-				buttons=gtk.BUTTONS_CLOSE)
-			message.set_markup('<big><b>Download backend failed</b></big>\n\n' \
-				'Either the download backend in question failed for some reason, or one could not be found with which to download iView programmes. Please check the README file for instructions on setting this up.')
-			message.run()
-			message.destroy()
-			return
-
-		self.download_worker = DownloadWorker(self).start()
+		self.url = url
+		self.dest_file = dest_file
 
 		gtk.Window.__init__(self)
 		self.connect('destroy', del_window)
@@ -128,8 +129,14 @@ class Downloader(gtk.Window):
 
 		bb = gtk.HButtonBox()
 		bb.set_layout(gtk.BUTTONBOX_END)
+		self.pause_btn = gtk.Button('Pause')
+		self.pause_btn.connect('clicked', self.pause_download)
+		self.resume_btn = gtk.Button('Resume')
+		self.resume_btn.connect('clicked', self.start_download)
 		self.close_btn = gtk.Button(stock=gtk.STOCK_STOP)
 		self.close_btn.connect('clicked', self.destroy)
+		bb.pack_end(self.pause_btn)
+		bb.pack_end(self.resume_btn)
 		bb.pack_end(self.close_btn)
 
 		vbox = gtk.VBox()
@@ -138,9 +145,37 @@ class Downloader(gtk.Window):
 		self.add(vbox)
 
 		self.show_all()
+		self.start_download() # kick off the DownloadWorker thread
+
+	def start_download(self, widget=None):
+		self.resume_btn.hide()
+		self.pause_btn.show()
+
+		self.job = iview.fetch.fetch_program(self.url, dest_file=self.dest_file)
+
+		if not self.job:
+			message = gtk.MessageDialog(
+				parent=None,
+				type=gtk.MESSAGE_ERROR,
+				buttons=gtk.BUTTONS_CLOSE)
+			message.set_markup('<big><b>Download backend failed</b></big>\n\n' \
+				'Either the download backend in question failed for some reason, or one could not be found with which to download iView programmes. Please check the README file for instructions on setting this up.')
+			message.run()
+			message.destroy()
+			return
+
+		self.download_worker = DownloadWorker(self).start()
+
+	def pause_download(self, widget=None):
+		self.job.terminate()
+		self.pause_btn.hide()
+		self.resume_btn.show()
 
 	def on_destroy(self, widget=None):
-		self.job.terminate()
+		try:
+			self.job.terminate()
+		except OSError: # this would trigger if it was
+			pass        # already killed for some reason
 
 	def destroy(self, null_param=None):
 		"""	Allow destroy() to be called with a parameter, thus allowing it to
