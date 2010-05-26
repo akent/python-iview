@@ -16,7 +16,7 @@ config_url = 'http://www.abc.net.au/iview/xml/config.xml?r=%d' % api_version
 auth_url   = 'http://www2b.abc.net.au/iView/Services/iViewHandshaker.asmx/isp'
 series_url = 'http://www.abc.net.au/iview/api/series_mrss.htm?id=%s'
 
-akamai_playpath_prefix = 'flash/playback/_definst_/'
+akamai_playpath_prefix = '/flash/playback/_definst_/'
 
 # Used for "SWF verification", a stream obfuscation technique
 swf_hash    = '96cc76f1d5385fb5cda6e2ce5c73323a399043d0bb6c687edd807e5c73c42b37'

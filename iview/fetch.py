@@ -5,7 +5,7 @@ import subprocess
 
 def get_filename(url):
 	return ''.join((
-		url.split('mp4:')[-1].split('/')[-1],
+		'.'.join(url.split('.')[:-1]).split('/')[-1],
 		'.flv',
 	))
 
@@ -18,7 +18,7 @@ def rtmpdump(rtmp_url, rtmp_host, rtmp_app, rtmp_playpath, output_filename, resu
 		)
 
 	args = [
-			None, # Written to later
+			None, # Name of executable; written to later.
 			'--host', rtmp_host,
 			'--app',  rtmp_app,
 			'--playpath', rtmp_playpath,
@@ -55,7 +55,13 @@ def fetch_program(url, execvp=False, dest_file=None):
 	resume = os.path.isfile(dest_file)
 	auth = comm.get_auth()
 
+	ext = url.split('.')[-1]
+	url = '.'.join(url.split('.')[:-1]) # strip the extension (.flv or .mp4)
+
 	url = auth['playpath_prefix'] + url
+
+	if ext == 'mp4':
+		url = ''.join(('mp4:', url))
 
 	return rtmpdump(
 			auth['rtmp_url'],

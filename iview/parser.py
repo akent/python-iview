@@ -57,9 +57,9 @@ def parse_auth(soup):
 
 		playpath_prefix = config.akamai_playpath_prefix
 
-		rtmp_url = comm.iview_config['rtmp_url']
+		rtmp_url  = comm.iview_config['rtmp_url']
 		rtmp_host = comm.iview_config['rtmp_host']
-		rtmp_app = comm.iview_config['rtmp_app']
+		rtmp_app  = comm.iview_config['rtmp_app']
 
 	token = xml.find("token").string
 	token = token.replace('&amp;', '&') # work around BeautifulSoup bug
@@ -106,14 +106,10 @@ def parse_series_items(series_iter, soup, programme):
 	series_xml = BeautifulStoneSoup(soup)
 
 	for program in series_xml.findAll('item'):
-		videoasset = program.find('videoasset').string
-		url = '.'.join(videoasset.split('.')[:-1]) # strip the .flv or .mp4
-		if videoasset.split('.')[-1] == 'mp4':
-			url = ''.join(('mp4:', url))
 		programme.append(series_iter, [
 				program.find('title').string,
 				None,
-				url,
+				program.find('videoasset').string,
 				program.find('description').string,
 			])
 
