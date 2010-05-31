@@ -45,6 +45,7 @@ class DownloadWorker(threading.Thread):
 		size_pattern = re.compile(r'\d+\.\d+ kB', re.IGNORECASE)
 
 		rate = 0
+		self.parent.progress.set_text('')
 
 		while True:
 			r = readupto(self.parent.job.stderr, cr)

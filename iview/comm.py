@@ -81,7 +81,7 @@ def get_programme(progress=None):
 		# and 'decrypt'.
 		index_data = r.engine_crypt(r.hex_to_str(index_data))
 
-	index = parser.parse_index(index_data, programme)
+	parser.parse_index(index_data, programme)
 
 def get_series_items(series_iter):
 	"""	This function fetches the series detail page for the selected series,
