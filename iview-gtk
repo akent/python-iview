@@ -201,6 +201,7 @@ def on_download_clicked(widget, data=None):
 		         gtk.STOCK_SAVE, gtk.RESPONSE_OK))
 
 	save_dialog.set_current_name(iview.fetch.get_filename(item[1]))
+	save_dialog.set_local_only(False) # allow saving to, e.g., SFTP
 	save_response = save_dialog.run()
 	save_dialog.hide()
 
