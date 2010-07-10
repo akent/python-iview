@@ -7,7 +7,8 @@ import iview.fetch
 def usage():
 	print("""usage:
 	-d, --download <url>	download a program
-	-p, --programme		print the iView programme (URL in parentheses)
+	-p, --programme		print the iView programme (the output has the URL in parentheses)
+	-o, --output		specify a file to output to (use - for stdout)
 	-a, --print-auth	print iView auth information (for debugging purposes)
 	-h, --help		this page""")
 
@@ -49,17 +50,22 @@ def print_auth():
 	print '\tRTMP URL:', auth['rtmp_url']
 	print '\tUnmetered:', str(auth['free'])
 
-def download(url):
+def download(url, output=None):
 	config()
-	iview.fetch.fetch_program(url, execvp=True)
+	iview.fetch.fetch_program(url, execvp=True, dest_file=output)
 
 try:
-	opts, args = getopt.getopt(sys.argv[1:], 'cd:pah', ['cache', 'download=', 'programme', 'program', 'print-auth', 'help'])
+	opts, args = getopt.getopt(sys.argv[1:],
+		'cd:po:ah',
+		['cache', 'download=', 'programme', 'program', 'output=', 'print-auth', 'help'])
 	if not len(opts) > 0:
 		raise getopt.GetoptError('Not enough arguments')
 except getopt.GetoptError, err:
 	usage()
 	sys.exit(2)
+
+download_arg = None
+output_arg = None
 
 for o, a in opts:
 	if o in ('-c', '--cache'):
@@ -72,8 +78,12 @@ for o, a in opts:
 	elif o in ('-a', '--print-auth'):
 		print_auth()
 	elif o in ('-d', '--download'):
-		download(a)
+		download_arg = a
+	elif o in ('-o', '--output'):
+		output_arg = a
 	elif o in ('-h', '--help'):
 		usage()
 		sys.exit(2)
 
+if download_arg is not None:
+	download(download_arg, output_arg)

@@ -52,7 +52,11 @@ def fetch_program(url, execvp=False, dest_file=None):
 	if dest_file is None:
 		dest_file = get_filename(url)
 
-	resume = os.path.isfile(dest_file)
+	if dest_file is not '-':
+		resume = os.path.isfile(dest_file)
+	else:
+		resume = False
+
 	auth = comm.get_auth()
 
 	ext = url.split('.')[-1]
