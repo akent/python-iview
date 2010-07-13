@@ -25,23 +25,15 @@ def config():
 
 def programme():
 	config()
-	iview.comm.get_programme()
+	index = iview.comm.get_index()
 
-	from iview.comm import programme
-	series = programme.get_iter_root()
-	while not series is None:
-		print(programme.get(series, 0)[0] + ':')
+	for series in index:
+		print series['title'] + ':'
 
-		# Remove initial "Loading..." item
-		item = programme.iter_children(series)
-		programme.remove(item)
+		items = iview.comm.get_series_items(series['id'])
 
-		iview.comm.get_series_items(series)
-		item = programme.iter_children(series)
-		while not item is None:
-			print('\t' + programme.get(item, 0)[0] + '\t(' + programme.get(item, 2)[0] + ')')
-			item = programme.iter_next(item)
-		series = programme.iter_next(series)
+		for item in items:
+			print '\t' + item['title'] + '\t(' + item['url'] + ')'
 
 def print_auth():
 	auth = iview.comm.get_auth()

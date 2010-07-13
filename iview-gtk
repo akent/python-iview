@@ -227,9 +227,15 @@ def on_listing_cursor_changed(widget):
 	description.set_text(item[2])
 	download_btn.set_sensitive(True)
 
+def load_programme():
+	global programme
+
+	for series in iview.comm.get_index():
+		series_iter = programme.append(None, [series['title'], series['id'], None, None])
+		programme.append(series_iter, ['Loading...', None, None, None])
+
 def load_series_items(widget, iter, path):
 	model = widget.get_model()
-
 	child = model.iter_children(iter)
 
 	if model.get(child, 2)[0] is not None:
@@ -237,7 +243,17 @@ def load_series_items(widget, iter, path):
 		# Better pull out.
 		return
 
-	iview.comm.get_series_items(iter)
+	series_id = model.get(iter, 1)[0]
+	items = iview.comm.get_series_items(series_id)
+
+	for item in items:
+		model.append(iter, [
+				item['title'],
+				None,
+				item['url'],
+				item['description'],
+			])
+
 	model.remove(child)
 
 def about(widget, data=None):
@@ -281,7 +297,10 @@ listing_scroller = gtk.ScrolledWindow()
 listing_scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 listing_scroller.set_shadow_type(gtk.SHADOW_IN)
 
-listing = gtk.TreeView(iview.comm.programme)
+# name, id, url, description
+programme = gtk.TreeStore(str, str, str, str)
+
+listing = gtk.TreeView(programme)
 listing.set_headers_visible(False)
 listing.get_selection().set_mode(gtk.SELECTION_SINGLE)
 listing.connect('cursor-changed', on_listing_cursor_changed)
@@ -327,7 +346,7 @@ except IndexError:
 
 try:
 	iview.comm.get_config()
-	iview.comm.get_programme()
+	load_programme()
 except urllib2.HTTPError, error:
 	message = gtk.MessageDialog(
 		parent=window,

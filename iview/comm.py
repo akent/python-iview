@@ -1,6 +1,5 @@
 import os
 import urllib2
-import gtk
 import config
 import parser
 import rc4
@@ -9,9 +8,6 @@ cache = False
 
 iview_config = None
 channels = None
-
-# name, id, url, description
-programme = gtk.TreeStore(str, str, str, str)
 
 def fetch_url(url):
 	"""	Simple function that fetches a URL using urllib2.
@@ -54,7 +50,7 @@ def get_config():
 		it tells us an always-metered "fallback" RTMP server, and points
 		us to many of iView's other XML files.
 	"""
-	global iview_config, channels
+	global iview_config
 
 	iview_config = parser.parse_config(maybe_fetch(config.config_url))
 
@@ -66,12 +62,11 @@ def get_auth():
 	"""
 	return parser.parse_auth(fetch_url(config.auth_url))
 
-def get_programme(progress=None):
+def get_index():
 	"""	This function pulls in the index, which contains the TV series
 		that are available to us. The index is possibly encrypted, so we
 		must decrypt it here before passing it to the parser.
 	"""
-	global programme
 
 	index_data = maybe_fetch(iview_config['api_url'] + 'seriesIndex')
 
@@ -81,16 +76,12 @@ def get_programme(progress=None):
 		# and 'decrypt'.
 		index_data = r.engine_crypt(r.hex_to_str(index_data))
 
-	parser.parse_index(index_data, programme)
+	return parser.parse_index(index_data)
 
-def get_series_items(series_iter):
+def get_series_items(series_id):
 	"""	This function fetches the series detail page for the selected series,
 		which contain the items (i.e. the actual episodes).
 	"""
-	global programme
-
-	series_id = programme.get(series_iter, 1)[0]
 
 	series_xml = maybe_fetch(config.series_url % series_id)
-	parser.parse_series_items(series_iter, series_xml, programme)
-
+	return parser.parse_series_items(series_xml)

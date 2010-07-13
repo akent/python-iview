@@ -1,4 +1,3 @@
-import gtk
 import comm
 import config
 from BeautifulSoup import BeautifulStoneSoup
@@ -73,26 +72,30 @@ def parse_auth(soup):
 		'free'            : (xml.find("free").string == "yes")
 	}
 
-def parse_index(soup, programme):
+def parse_index(soup):
 	"""	This function parses the index, which is an overall listing
 		of all programs available in iView. The index is divided into
 		'series' and 'items'. Series are things like 'beached az', while
 		items are things like 'beached az Episode 8'.
 	"""
-	index = json.loads(soup)
+	index_json = json.loads(soup)
+	index_json.sort(key=lambda series: series[1]) # alphabetically sort by title
 
-	index.sort(key=lambda series: series[1])
+	index_dict = []
 
-	for series in index:
+	for series in index_json:
 		# HACK: replace &amp; with & because HTML entities don't make
 		# the slightest bit of sense inside a JSON structure.
 		title = series[1].replace('&amp;', '&')
-		series_id = series[0]
 
-		series_iter = programme.append(None, [title, series_id, None, None])
-		programme.append(series_iter, ['Loading...', None, None, None])
+		index_dict.append({
+			'id'    : series[0],
+			'title' : title,
+		})
 
-def parse_series_items(series_iter, soup, programme):
+	return index_dict
+
+def parse_series_items(soup):
 	# HACK: replace <abc: with < because BeautifulSoup doesn't have
 	# any (obvious) way to inspect inside namespaces.
 	soup = soup \
@@ -105,11 +108,13 @@ def parse_series_items(series_iter, soup, programme):
 
 	series_xml = BeautifulStoneSoup(soup)
 
-	for program in series_xml.findAll('item'):
-		programme.append(series_iter, [
-				program.find('title').string,
-				None,
-				program.find('videoasset').string,
-				program.find('description').string,
-			])
+	items = []
 
+	for program in series_xml.findAll('item'):
+		items.append({
+			'title'       : program.find('title').string,
+			'url'         : program.find('videoasset').string,
+			'description' : program.find('description').string,
+		})
+
+	return items
