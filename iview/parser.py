@@ -79,17 +79,17 @@ def parse_index(soup):
 		items are things like 'beached az Episode 8'.
 	"""
 	index_json = json.loads(soup)
-	index_json.sort(key=lambda series: series[1]) # alphabetically sort by title
+	index_json.sort(key=lambda series: series['b']) # alphabetically sort by title
 
 	index_dict = []
 
 	for series in index_json:
 		# HACK: replace &amp; with & because HTML entities don't make
 		# the slightest bit of sense inside a JSON structure.
-		title = series[1].replace('&amp;', '&')
+		title = series['b'].replace('&amp;', '&')
 
 		index_dict.append({
-			'id'    : series[0],
+			'id'    : series['a'],
 			'title' : title,
 		})
 
