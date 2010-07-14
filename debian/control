@@ -1,5 +1,5 @@
 Source: python-iview
-Section: main
+Section: net
 Priority: extra
 Maintainer: Jeremy Visser <jeremy@visser.name>
 Build-Depends: debhelper (>= 7), cdbs, python, python-support
