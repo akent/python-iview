@@ -95,26 +95,42 @@ def parse_index(soup):
 
 	return index_dict
 
-def parse_series_items(soup):
-	# HACK: replace <abc: with < because BeautifulSoup doesn't have
+def parse_series_items(soup, get_meta=False):
+	# HACK: replace <abc: and <media: with < because BeautifulSoup doesn't have
 	# any (obvious) way to inspect inside namespaces.
 	soup = soup \
-		.replace('<abc:', '<') \
-		.replace('</abc:', '</')
+		.replace('<abc:', '<')     \
+		.replace('</abc:', '</')   \
+		.replace('<media:', '<')   \
+		.replace('</media:', '</') \
 
 	# HACK: replace &amp; with & because HTML entities aren't
 	# valid in plain XML, but the ABC doesn't know that.
 	soup = soup.replace('&amp;', '&')
 
-	series_xml = BeautifulStoneSoup(soup)
+	series = BeautifulStoneSoup(soup)
 
 	items = []
 
-	for program in series_xml.findAll('item'):
+	for program in series.findAll('item'):
 		items.append({
 			'title'       : program.find('title').string,
 			'url'         : program.find('videoasset').string,
 			'description' : program.find('description').string,
+			'thumb'       : program.find('thumbnail').get('url'),
+			'date'        : program.find('transmitdate').string,
+			'rating'      : program.find('rating').string,
+			'link'        : program.find('player').get('url'), # link to play on iView site
+			'home'        : program.find('linkurl').string, # program website
 		})
 
-	return items
+	if get_meta:
+		meta = {
+			'title' : series.find('title').string,
+			'link'  : series.find('link').string, # link to series listing on iView site
+			'thumb' : series.find('image').find('url').string,
+			'description' : series.find('description').string,
+		}
+		return (items, meta)
+	else:
+		return items

@@ -78,10 +78,10 @@ def get_index():
 
 	return parser.parse_index(index_data)
 
-def get_series_items(series_id):
+def get_series_items(series_id, get_meta=False):
 	"""	This function fetches the series detail page for the selected series,
 		which contain the items (i.e. the actual episodes).
 	"""
 
 	series_xml = maybe_fetch(config.series_url % series_id)
-	return parser.parse_series_items(series_xml)
+	return parser.parse_series_items(series_xml, get_meta)
