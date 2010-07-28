@@ -6,10 +6,15 @@ import iview.fetch
 
 def usage():
 	print("""usage:
-	-d, --download <url>	download a program
-	-p, --programme		print the iView programme (the output has the URL in parentheses)
+	-i, --index		prints the iView index (number is the series ID)
+	-s, --series <id>	get the list of episodes for the series
+	-p, --programme		prints the entire iView programme at once
+				(warning: very slow!)
+	-d, --download <url>	download an episode
+				(pass the url you got from -s or -p)
 	-o, --output		specify a file to output to (use - for stdout)
-	-a, --print-auth	print iView auth information (for debugging purposes)
+
+	-a, --print-auth	print debug iView auth information
 	-h, --help		this page""")
 
 def config():
@@ -24,6 +29,10 @@ def config():
 		sys.exit(1)
 
 def programme():
+	"""	Downloads the iView index, and then prints each item in all series.
+		This is a slow function. Using index() and subsequently cherrypicking
+		a series to pass to series() is much faster.
+	"""
 	config()
 	index = iview.comm.get_index()
 
@@ -34,6 +43,22 @@ def programme():
 
 		for item in items:
 			print '\t' + item['title'] + '\t(' + item['url'] + ')'
+
+def index():
+	"""	Downloads the iView index, and prints the corresponding series and IDs.
+	"""
+	config()
+	index = iview.comm.get_index()
+
+	for series in index:
+		print series['id'] + '\t' + series['title']
+
+def series(series_id):
+	config()
+	items = iview.comm.get_series_items(series_id)
+
+	for item in items:
+		print item['title'] + '\t(' + item['url'] + ')'
 
 def print_auth():
 	auth = iview.comm.get_auth()
@@ -48,8 +73,8 @@ def download(url, output=None):
 
 try:
 	opts, args = getopt.getopt(sys.argv[1:],
-		'cd:po:ah',
-		['cache', 'download=', 'programme', 'program', 'output=', 'print-auth', 'help'])
+		'cd:pis:o:ah',
+		['cache', 'download=', 'programme', 'program', 'index', 'series=', 'output=', 'print-auth', 'help'])
 	if not len(opts) > 0:
 		raise getopt.GetoptError('Not enough arguments')
 except getopt.GetoptError, err:
@@ -59,23 +84,27 @@ except getopt.GetoptError, err:
 download_arg = None
 output_arg = None
 
-for o, a in opts:
-	if o in ('-c', '--cache'):
-		iview.comm.cache = True
-	if o in ('-p', '--programme', '--program'):
-		try:
+try:
+	for o, a in opts:
+		if o in ('-c', '--cache'):
+			iview.comm.cache = True
+		if o in ('-p', '--programme', '--program'):
 			programme()
-		except KeyboardInterrupt: # don't traceback on a Ctrl+C
-			pass
-	elif o in ('-a', '--print-auth'):
-		print_auth()
-	elif o in ('-d', '--download'):
-		download_arg = a
-	elif o in ('-o', '--output'):
-		output_arg = a
-	elif o in ('-h', '--help'):
-		usage()
-		sys.exit(2)
+		if o in ('-i', '--index'):
+			index()
+		if o in ('-s', '--series'):
+			series(a)
+		elif o in ('-a', '--print-auth'):
+			print_auth()
+		elif o in ('-d', '--download'):
+			download_arg = a
+		elif o in ('-o', '--output'):
+			output_arg = a
+		elif o in ('-h', '--help'):
+			usage()
+			sys.exit(2)
+except KeyboardInterrupt: # don't traceback on a Ctrl+C
+	pass
 
 if download_arg is not None:
 	download(download_arg, output_arg)
