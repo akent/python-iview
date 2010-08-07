@@ -32,6 +32,10 @@ def rtmpdump(rtmp_url, rtmp_host, rtmp_app, rtmp_playpath, output_filename, resu
 	if resume:
 		args.append('--resume')
 
+	if config.socks_proxy_host is not None:
+		args.append('--socks')
+		args.append(config.socks_proxy_host + ':' + str(config.socks_proxy_port))
+
 	for exec_attempt in executables:
 		print 'Starting %s...' % exec_attempt
 		args[0] = exec_attempt

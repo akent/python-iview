@@ -28,3 +28,9 @@ swf_url     = 'http://www.abc.net.au/iview/images/iview.jpg'
 index_password = 'wallace'
 
 use_encryption = False
+
+# Default configuration for SOCKS proxy.  If host is specified
+# as 'None' then no proxy will be used.  The default port number
+# will be used if only a host name is specified for the proxy.
+socks_proxy_host = None
+socks_proxy_port = 1080

@@ -1,8 +1,9 @@
 import os
-import urllib2
+import sys
 import config
 import parser
 import rc4
+# urllib2 is imported at end
 
 cache = False
 
@@ -85,3 +86,26 @@ def get_series_items(series_id, get_meta=False):
 
 	series_xml = maybe_fetch(config.series_url % series_id)
 	return parser.parse_series_items(series_xml, get_meta)
+
+def configure_socks_proxy():
+	"""	Import the modules necessary to support usage of a SOCKS proxy
+		and configure it using the current settings in iview.config
+		NOTE: It would be safe to call this function multiple times
+		from, say, a GTK settings dialog
+	"""
+	try:
+		import socks
+		import socket
+		socket.socket = socks.socksocket
+	except:
+		print "The Python SOCKS client module is required for proxy support."
+		print "On Debian/Ubuntu this is provided by the python-socksipy package."
+		sys.exit(3)
+
+	socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, config.socks_proxy_host, config.socks_proxy_port)
+
+if config.socks_proxy_host is not None:
+	configure_socks_proxy()
+
+# must be done after the (optional) SOCKS proxy is configured
+import urllib2
