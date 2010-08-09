@@ -134,3 +134,24 @@ def parse_series_items(soup, get_meta=False):
 		return (items, meta)
 	else:
 		return items
+
+def parse_captions(soup):
+	"""	Converts custom iView captions into SRT format, usable in most
+		decent media players.
+	"""
+	xml = BeautifulStoneSoup(soup)
+
+	output = u''
+
+	i = 1
+	for title in xml.findAll('title'):
+		start = title['start']
+		ids = start.rfind(':')
+		end = title['end']
+		ide = end.rfind(':')
+		output = output + str(i) + u'\n'
+		output = output + start[:ids] + u',' + start[ids+1:] + u' --> ' + end[:ide] + ',' + end[ide+1:] + u'\n'
+		output = output + title.string.replace('|','\n') + u'\n\n'
+		i += 1
+
+	return output

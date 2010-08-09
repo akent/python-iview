@@ -87,6 +87,15 @@ def get_series_items(series_id, get_meta=False):
 	series_xml = maybe_fetch(config.series_url % series_id)
 	return parser.parse_series_items(series_xml, get_meta)
 
+def get_captions(url):
+	"""	This function takes a program name (e.g. news/730report_100803) and
+		fetches the corresponding captions file. It then passes it to
+		parse_subtitle(), which converts it to SRT format.
+	"""
+
+	xml = maybe_fetch(config.captions_url % url)
+	return parser.parse_captions(xml)
+
 def configure_socks_proxy():
 	"""	Import the modules necessary to support usage of a SOCKS proxy
 		and configure it using the current settings in iview.config
