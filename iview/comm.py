@@ -84,8 +84,8 @@ def get_series_items(series_id, get_meta=False):
 		which contain the items (i.e. the actual episodes).
 	"""
 
-	series_xml = maybe_fetch(config.series_url % series_id)
-	return parser.parse_series_items(series_xml, get_meta)
+	series_json = maybe_fetch(iview_config['api_url'] + 'series=%s' % series_id)
+	return parser.parse_series_items(series_json, get_meta)
 
 def get_captions(url):
 	"""	This function takes a program name (e.g. news/730report_100803) and
