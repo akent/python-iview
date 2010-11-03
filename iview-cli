@@ -63,6 +63,7 @@ def series(series_id):
 		print item['title'] + '\t(' + item['url'] + ')'
 
 def print_auth():
+	config()
 	auth = iview.comm.get_auth()
 	print 'iView auth data:'
 	print '\tToken:', auth['token']

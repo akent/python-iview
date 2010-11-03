@@ -61,7 +61,7 @@ def get_auth():
 		and gives us a one-time token we need to use to speak RTSP with
 		ABC's servers, and tells us what the RTMP URL is.
 	"""
-	return parser.parse_auth(fetch_url(config.auth_url))
+	return parser.parse_auth(fetch_url(iview_config['auth_url']))
 
 def get_index():
 	"""	This function pulls in the index, which contains the TV series

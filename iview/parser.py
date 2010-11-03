@@ -24,6 +24,7 @@ def parse_config(soup):
 		'rtmp_url'  : rtmp_url,
 		'rtmp_host' : rtmp_chunks[2],
 		'rtmp_app'  : rtmp_chunks[3],
+		'auth_url'  : xml.find('param', attrs={'name':'auth'}).get('value'),
 		'api_url' : xml.find('param', attrs={'name':'api'}).get('value'),
 		'categories_url' : xml.find('param', attrs={'name':'categories'}).get('value'),
 	}

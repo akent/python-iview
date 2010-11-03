@@ -8,12 +8,11 @@ try:
 	uname = os.uname()
 	os_string = ' (%s %s %s)' % (uname[0], uname[2], uname[4])
 except AttributeError:
-	os_string = ''
+	os_string = ' (non-Unix OS)'
 
 user_agent = 'Python-iView %s%s' % (version, os_string)
 
 config_url   = 'http://www.abc.net.au/iview/xml/config.xml?r=%d' % api_version
-auth_url     = 'http://www2b.abc.net.au/iViewHandshaker/services/iviewhandshaker.asmx/isp'
 series_url   = 'http://www.abc.net.au/iview/api/series_mrss.htm?id=%s'
 captions_url = 'http://www.abc.net.au/iview/captions/%s.xml'
 
