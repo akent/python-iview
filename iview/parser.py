@@ -101,14 +101,14 @@ def parse_series_items(soup, get_meta=False):
 
 	items = []
 
-	for item in series_json[0]['f']:
-		for optional_key in ('d', 'r', 's', 'l'):
-			try:
-				item[optional_key]
-			except KeyError:
-				item[optional_key] = ''
+	try:
+		for item in series_json[0]['f']:
+			for optional_key in ('d', 'r', 's', 'l'):
+				try:
+					item[optional_key]
+				except KeyError:
+					item[optional_key] = ''
 
-		try:
 			items.append({
 				'id'          : item['a'],
 				'title'       : item['b'].replace('&amp;', '&'), # HACK. See comment in parse_index()
@@ -119,14 +119,14 @@ def parse_series_items(soup, get_meta=False):
 				'date'        : item['f'],
 				'home'        : item['l'], # program website
 			})
-		except KeyError:
-			print 'An item we parsed had some missing info, so we skipped an episode. Maybe the ABC changed their API recently?'
+	except KeyError:
+		print 'An item we parsed had some missing info, so we skipped an episode. Maybe the ABC changed their API recently?'
 
 	if get_meta:
 		meta = {
-			'id'    : series_json['a'],
-			'title' : series_json['b'],
-			'thumb' : series_json['d'],
+			'id'    : series_json[0]['a'],
+			'title' : series_json[0]['b'],
+			'thumb' : series_json[0]['d'],
 		}
 		return (items, meta)
 	else:
