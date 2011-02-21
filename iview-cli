@@ -150,9 +150,7 @@ output_arg = None
 
 try:
 	for o, a in opts:
-		if o in ('-c', '--cache'):
-			iview.comm.cache = True
-		elif o in ('-x', '--proxy'):
+		if o in ('-x', '--proxy'):
 			err = parse_proxy_argument(a)
 			if err is not None:
 				print "Invalid proxy specification: %s\n" % err
@@ -175,7 +173,9 @@ try:
 	import iview.comm
 
 	for o, a in opts:
-		if o in ('-p', '--programme', '--program'):
+		if o in ('-c', '--cache'):
+			iview.comm.cache = True
+		elif o in ('-p', '--programme', '--program'):
 			programme()
 		elif o in ('-i', '--index'):
 			index()
