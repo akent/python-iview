@@ -24,11 +24,6 @@ swf_size    = '2122'
 
 swf_url     = 'http://www.abc.net.au/iview/images/iview.jpg'
 
-# Used for decrypting the obfuscated index.xml file -- uses the RC4 cipher
-index_password = 'wallace'
-
-use_encryption = False
-
 # Default configuration for SOCKS proxy.  If host is specified
 # as 'None' then no proxy will be used.  The default port number
 # will be used if only a host name is specified for the proxy.

@@ -2,7 +2,6 @@ import os
 import sys
 import config
 import parser
-import rc4
 # urllib2 is imported at end
 
 cache = False
@@ -70,12 +69,6 @@ def get_index():
 	"""
 
 	index_data = maybe_fetch(iview_config['api_url'] + 'seriesIndex')
-
-	if config.use_encryption:
-		r = rc4.RC4(config.index_password)
-		# RC4 is bidirectional, no need to distinguish between 'encrypt'
-		# and 'decrypt'.
-		index_data = r.engine_crypt(r.hex_to_str(index_data))
 
 	return parser.parse_index(index_data)
 
