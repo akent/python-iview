@@ -2,6 +2,8 @@ import os
 import sys
 import config
 import parser
+import gzip
+from StringIO import StringIO
 # urllib2 is imported at end
 
 cache = False
@@ -13,8 +15,18 @@ def fetch_url(url):
 	"""	Simple function that fetches a URL using urllib2.
 		An exception is raised if an error (e.g. 404) occurs.
 	"""
-	http = urllib2.urlopen(urllib2.Request(url, None, {'User-Agent' : config.user_agent}))
-	return http.read()
+	http = urllib2.urlopen(
+		urllib2.Request(url, None, {
+			'User-Agent' : config.user_agent,
+		 	'Accept-Encoding' : 'gzip'
+		 })
+	)
+	headers = http.info()
+	if 'content-encoding' in headers.keys() and headers['content-encoding'] == 'gzip':
+		data = StringIO(http.read())
+		return gzip.GzipFile(fileobj=data).read()
+	else:
+		return http.read()
 
 def maybe_fetch(url):
 	"""	Only fetches a URL if it is not in the cache/ directory.
