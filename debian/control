@@ -8,7 +8,7 @@ Homepage: http://jeremy.visser.name/python-iview/
 
 Package: python-iview
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, python-all | python (>= 2.6) | python2.7 | python2.6 , python-beautifulsoup, rtmpdump
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-all | python (>= 2.6) | python2.7 | python2.6, python-beautifulsoup, rtmpdump
 Suggests: python-simplejson, python-socksipy
 Description: GTK+–based frontend to ABC iView
  The ABC iView service is a video-on-demand streaming service
