@@ -17,6 +17,8 @@ def parse_config(soup):
 	xml = BeautifulStoneSoup(soup)
 
 	# should look like "rtmp://cp53909.edgefcs.net/ondemand"
+	# Looks like the ABC don't always include this field.
+	# If not included, that's okay -- ABC usually gives us the server in the auth result as well.
 	rtmp_url = xml.find('param', attrs={'name':'server_streaming'}).get('value')
 	rtmp_chunks = rtmp_url.split('/')
 
@@ -27,6 +29,7 @@ def parse_config(soup):
 		'auth_url'  : xml.find('param', attrs={'name':'auth'}).get('value'),
 		'api_url' : xml.find('param', attrs={'name':'api'}).get('value'),
 		'categories_url' : xml.find('param', attrs={'name':'categories'}).get('value'),
+		'captions_url' : xml.find('param', attrs={'name':'captions'}).get('value'),
 	}
 
 def parse_auth(soup):
@@ -40,7 +43,13 @@ def parse_auth(soup):
 	# should look like "rtmp://203.18.195.10/ondemand"
 	rtmp_url = xml.find('server').string
 
-	playpath_prefix = ''
+	# at time of writing, either 'Akamai' (usually metered) or 'Hostworks' (usually unmetered)
+	stream_host = xml.find('host').string
+
+	if stream_host == 'Akamai':
+		playpath_prefix = config.akamai_playpath_prefix
+	else:
+		playpath_prefix = ''
 
 	if rtmp_url is not None:
 		# Being directed to a custom streaming server (i.e. for unmetered services).
@@ -54,8 +63,6 @@ def parse_auth(soup):
 
 		if not comm.iview_config:
 			comm.get_config()
-
-		playpath_prefix = config.akamai_playpath_prefix
 
 		rtmp_url  = comm.iview_config['rtmp_url']
 		rtmp_host = comm.iview_config['rtmp_host']

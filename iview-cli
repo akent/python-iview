@@ -68,6 +68,7 @@ def print_auth():
 	print 'iView auth data:'
 	print '\tToken:', auth['token']
 	print '\tRTMP URL:', auth['rtmp_url']
+	print '\tPlaypath Prefix:', auth['playpath_prefix']
 	print '\tUnmetered:', str(auth['free'])
 
 def download(url, output=None):
@@ -77,6 +78,8 @@ def download(url, output=None):
 def subtitles(name, output=None):
 	# In this function, we print >> sys.stderr because we have the possibility
 	# of outputting subtitles to stdout, so we need to keep stdout clean.
+
+	config()
 
 	url = ''.join(name.split('.')[:-1])
 	if output is not None:

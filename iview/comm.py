@@ -98,7 +98,9 @@ def get_captions(url):
 		parse_subtitle(), which converts it to SRT format.
 	"""
 
-	xml = maybe_fetch(config.captions_url % url)
+	captions_url = iview_config['captions_url'] + '%s.xml'
+
+	xml = maybe_fetch(captions_url % url)
 	return parser.parse_captions(xml)
 
 def configure_socks_proxy():
