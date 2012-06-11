@@ -57,6 +57,7 @@ class DownloadWorker(threading.Thread):
 				p = float(progress_search.group()[:-1]) / 100. # [:-1] shaves the % off the end
 				gtk.gdk.threads_enter()
 				self.parent.progress.set_fraction(p)
+				self.parent.set_title("(%0.1f%%) %s" %(p*100, self.parent.my_title))
 				gtk.gdk.threads_leave()
 			if size_search is not None:
 				gtk.gdk.threads_enter()
@@ -73,6 +74,7 @@ class DownloadWorker(threading.Thread):
 		if returncode == 0: # EXIT_SUCCESS
 			self.parent.progress.set_fraction(1.)
 			self.parent.progress.set_text('Download finished')
+			self.parent.set_title(self.parent.my_title)
 			self.parent.close_btn.set_label(gtk.STOCK_CLOSE)
 			self.parent.pause_btn.hide()
 			self.parent.resume_btn.hide()
@@ -97,6 +99,7 @@ class Downloader(gtk.Window):
 
 		if title is None:
 			title = url
+		self.my_title = dest_file.split("/")[-1]
 		self.set_title(title)
 		self.set_resizable(False)
 		self.set_default_size(400,0)
@@ -204,7 +207,26 @@ def on_download_clicked(widget, data=None):
 		save_dialog.set_current_folder(save_location)
 	except NameError: # if we haven't set a save_location yet
 		pass
-	save_dialog.set_current_name(iview.fetch.get_filename(item[1]))
+	
+	# build a nice filename
+	# could use this ugly version instead:
+	#   save_dialog.set_current_name(iview.fetch.get_filename(item[1]))
+	# TODO: This may hamper (future) GTK+-based subtitle downloading unless
+	# this is made into a shared function
+
+	program = model.get(model.iter_parent(selected_iter), 0, 1)[0]
+	title = item[0]
+	ext = item[1].split(".")[-1]
+	# for specials that title == program, just use program.ext
+	if program == title:
+		filename = "%s.%s" %(program, ext)
+	else:
+		filename = "%s - %s.%s" %(program, title, ext)
+
+	# strip invalid filename characters < > : " / \ | ? *
+	filename = re.sub('[\<\>\:\"\/\\\|\?\*]', '-', filename)
+	save_dialog.set_current_name(filename)
+
 	save_dialog.set_local_only(False) # allow saving to, e.g., SFTP
 	save_response = save_dialog.run()
 	save_dialog.hide()
