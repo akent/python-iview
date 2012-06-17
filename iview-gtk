@@ -216,7 +216,7 @@ def on_download_clicked(widget, data=None):
 
 	program = model.get(model.iter_parent(selected_iter), 0, 1)[0]
 	title = item[0]
-	ext = item[1].split(".")[-1]
+	ext = 'flv' # ABC always provides us with an FLV container
 	# for specials that title == program, just use program.ext
 	if program == title:
 		filename = "%s.%s" %(program, ext)
